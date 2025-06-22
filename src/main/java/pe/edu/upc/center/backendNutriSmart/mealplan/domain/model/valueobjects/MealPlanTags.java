@@ -1,0 +1,31 @@
+package pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.ToString;
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanTag;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@ToString
+@Embeddable
+public class MealPlanTags {
+    @Getter
+    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL)
+    private List<MealPlanTag> mealPlanTags;
+
+    public MealPlanTags() {
+        this.mealPlanTags = new ArrayList<>();
+    }
+
+    public void addItem(MealPlanTag mealPlanTag) {
+        this.mealPlanTags.add(mealPlanTag);
+    }
+    public void addItems(List<MealPlanTag> mealPlanTags) {
+        this.mealPlanTags.addAll(mealPlanTags);
+    }
+
+}
