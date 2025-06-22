@@ -15,7 +15,7 @@ import java.util.List;
 public class MealPlanEntries {
 
     @Getter
-    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MealPlanEntry> mealPlanEntries;
 
     public MealPlanEntries(){this.mealPlanEntries=new ArrayList<>();}
@@ -31,6 +31,10 @@ public class MealPlanEntries {
             this.mealPlanEntries = new ArrayList<>();
         }
         this.mealPlanEntries.addAll(mealPlanEntries);
+    }
+    public void replaceWith(List<MealPlanEntry> newEntries) {
+        this.mealPlanEntries.clear();
+        this.mealPlanEntries.addAll(newEntries);
     }
 
 }

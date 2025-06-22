@@ -27,4 +27,11 @@ public class MealPlanEntry {
     @JoinColumn(name = "meal_plan_id", nullable = false)
     private MealPlan mealPlan;
 
+    public MealPlanEntry() {
+    }
+    public MealPlanEntry(RecipeId recipeId, MealPlanType mealPlanType, MealPlan mealPlan) {
+        this.recipeId = recipeId;
+        this.mealPlanType = mealPlanType;
+        this.mealPlan = mealPlan;
+    }
 }

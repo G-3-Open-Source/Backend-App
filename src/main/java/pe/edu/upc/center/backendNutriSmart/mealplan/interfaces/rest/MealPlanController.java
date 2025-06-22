@@ -1,5 +1,9 @@
 package pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +37,29 @@ public class MealPlanController {
         this.mealPlanCommandService = mealPlanCommandService;
     }
 
+    @Operation(
+            summary = "Add a new meal plan item",
+            description = "Add a new meal plan",
+            operationId = "createMealPlan",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Successful operation",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MealPlanResource.class)
+                            )
+                    ),
+                    @ApiResponse (
+                            responseCode = "400",
+                            description = "Bad Request",
+                            content = @Content (
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = RuntimeException.class)
+                            )
+                    )
+            }
+    )
     @PostMapping
     public ResponseEntity<MealPlanResource> createStudent(@RequestBody CreateMealPlanResource resource) {
         // Create meal plan

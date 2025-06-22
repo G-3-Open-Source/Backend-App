@@ -2,6 +2,8 @@ package pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.aggregates;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.commands.CreateMealPlanCommand;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanTag;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanType;
@@ -13,6 +15,7 @@ import pe.edu.upc.center.backendNutriSmart.shared.domain.model.aggregates.Audita
 
 import java.util.Date;
 @Getter
+@Setter
 @Entity
 @Table(name = "meal_plans")
 public class MealPlan extends AuditableAbstractAggregateRoot<MealPlan> {
@@ -53,6 +56,17 @@ public class MealPlan extends AuditableAbstractAggregateRoot<MealPlan> {
 
 
     public MealPlan() {}
+
+    public MealPlan(CreateMealPlanCommand command) {
+        this.name = command.name();
+        this.description = command.description();
+        this.macros = command.macros();
+        this.profileId = command.profileId();
+        this.entries = new MealPlanEntries();
+        this.tags = new MealPlanTags();
+        this.category = command.category();
+        this.isCurrent = command.isCurrent();
+    }
     public void recalculateMacros() {
 //        int totalCalories = 0, totalCarbs = 0, totalProteins = 0, totalFats = 0;
 //

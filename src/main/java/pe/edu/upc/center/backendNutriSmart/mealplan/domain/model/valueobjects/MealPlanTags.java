@@ -14,7 +14,7 @@ import java.util.List;
 @Embeddable
 public class MealPlanTags {
     @Getter
-    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MealPlanTag> mealPlanTags;
 
     public MealPlanTags() {
@@ -26,6 +26,11 @@ public class MealPlanTags {
     }
     public void addItems(List<MealPlanTag> mealPlanTags) {
         this.mealPlanTags.addAll(mealPlanTags);
+    }
+
+    public void replaceWith(List<MealPlanTag> newTags) {
+        this.mealPlanTags.clear();
+        this.mealPlanTags.addAll(newTags);
     }
 
 }
