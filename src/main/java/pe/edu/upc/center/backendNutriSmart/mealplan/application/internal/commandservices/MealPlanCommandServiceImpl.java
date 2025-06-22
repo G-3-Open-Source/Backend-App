@@ -26,8 +26,10 @@ public class MealPlanCommandServiceImpl implements MealPlanCommandService {
     @Override
     public void handle(DeleteMealPlanCommand command) {
         if(command == null || command.mealPlanId() <= 0) {
-            throw new IllegalArgumentException("MealPlan ID must not be null");
+            throw new IllegalArgumentException("MealPlan ID not found");
         }
+        var optionalMealPlan = this.mealPlanRepository.findById(command.mealPlanId());
+        this.mealPlanRepository.deleteById(optionalMealPlan.get().getId());
 
     }
 

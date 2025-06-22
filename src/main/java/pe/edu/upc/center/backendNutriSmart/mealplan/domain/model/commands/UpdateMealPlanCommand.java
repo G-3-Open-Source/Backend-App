@@ -1,15 +1,19 @@
 package pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.commands;
 
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.MealPlanMacros;
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.UserProfileId;
+
+import java.util.List;
+
 public record UpdateMealPlanCommand(
+        int id,
         String name,
         String description,
-        float calories,
-        float carbs,
-        float proteins,
-        float fats,
-        int userProfileId,
-        String tag,
+        MealPlanMacros macros,
+        UserProfileId profileId,
         String category,
-        Boolean isCurrent
+        boolean isCurrent,
+        List<UpdateMealPlanEntryCommand> entries,
+        List<String> tags
 ) {
 }

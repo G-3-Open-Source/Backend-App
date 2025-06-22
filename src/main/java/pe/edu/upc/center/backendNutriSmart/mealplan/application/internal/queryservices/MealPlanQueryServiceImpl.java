@@ -20,16 +20,16 @@ public class MealPlanQueryServiceImpl implements MealPlanQueryService {
     }
     @Override
     public Optional<MealPlan> handle(GetMealPlanByIdQuery query) {
-        return Optional.empty();
+        return this.mealPlanRepository.findById(query.mealPlanId());
     }
 
     @Override
     public List<MealPlan> handle(GetAllMealPlanQuery query) {
-        return List.of();
+        return this.mealPlanRepository.findAll();
     }
 
     @Override
     public List<MealPlan> handle(GetAllMealPlanByProfileIdQuery query) {
-        return List.of();
+        return this.mealPlanRepository.findAllByProfileId(query.ProfileId());
     }
 }

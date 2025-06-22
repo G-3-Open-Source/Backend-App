@@ -3,6 +3,7 @@ package pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.aggregates;
 import jakarta.persistence.*;
 import lombok.Getter;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanEntry;
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanTag;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.entities.MealPlanType;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.MealPlanEntries;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.MealPlanMacros;
@@ -16,10 +17,6 @@ import java.util.Date;
 @Table(name = "meal_plans")
 public class MealPlan extends AuditableAbstractAggregateRoot<MealPlan> {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;
@@ -79,6 +76,13 @@ public class MealPlan extends AuditableAbstractAggregateRoot<MealPlan> {
 //    }
     public void assignAsCurrent(){};
     public void unassignAsCurrent(){};
+    public void addEntry(MealPlanEntry entry) {
+        this.entries.getMealPlanEntries().add(entry);
+    }
+
+    public void addTag(MealPlanTag tag) {
+        this.tags.getMealPlanTags().add(tag);
+    }
 
 //    public void addMeal(DayNumber day, MealPlanType type, RecipeReference recipe);
 //    public void removeMeal(DayNumber day, MealPlanType type);

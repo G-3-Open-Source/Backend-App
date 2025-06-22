@@ -1,18 +1,14 @@
 package pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform;
 
-import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.commands.CreateMealPlanCommand;
-import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.commands.CreateMealPlanEntryCommand;
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.commands.UpdateMealPlanCommand;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.MealPlanMacros;
-import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.MealPlanTags;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.UserProfileId;
-import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.CreateMealPlanEntryResource;
-import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.CreateMealPlanResource;
+import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanResource;
 
-import java.util.List;
-
-public class CreateMealPlanCommandFromResourceAssembler {
-    public static CreateMealPlanCommand toCommandFromResource(CreateMealPlanResource resource) {
-        return new CreateMealPlanCommand(
+public class UpdateMealPlanCommandFromResourceAssembler {
+    public static UpdateMealPlanCommand toCommandFromResource(MealPlanResource resource, int mealPlanId) {
+        return new UpdateMealPlanCommand(
+            mealPlanId,
                 resource.name(),
                 resource.description(),
                 new MealPlanMacros(
@@ -25,7 +21,7 @@ public class CreateMealPlanCommandFromResourceAssembler {
                 resource.category(),
                 resource.isCurrent(),
                 resource.entries().stream()
-                        .map(CreateMealPlanEntryCommandFromResourceAssembler::toCommandFromResource)
+                        .map(UpdateMealPlanEntryCommandFromResourceAssembler::toCommandFromResource)
                         .toList(),
                 resource.tags()
         );

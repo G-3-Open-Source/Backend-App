@@ -11,8 +11,11 @@ import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetAllM
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetMealPlanByIdQuery;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.services.MealPlanCommandService;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.services.MealPlanQueryService;
+import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.CreateMealPlanResource;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanResource;
+import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.CreateMealPlanCommandFromResourceAssembler;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.MealPlanResourceFromEntityAssembler;
+import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.UpdateMealPlanCommandFromResourceAssembler;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,26 +33,26 @@ public class MealPlanController {
         this.mealPlanCommandService = mealPlanCommandService;
     }
 
-/*    @PostMapping
-    public ResponseEntity<StudentResource> createStudent(@RequestBody CreateStudentResource resource) {
-        // Create student
-        var createStudentCommand = CreateStudentCommandFromResourceAssembler.toCommandFromResource(resource);
-        var studentCode = this.studentCommandService.handle(createStudentCommand);
-        // Validate if student code is empty
-        if (studentCode.studentCode().isEmpty()) {
+    @PostMapping
+    public ResponseEntity<MealPlanResource> createStudent(@RequestBody CreateMealPlanResource resource) {
+        // Create meal plan
+        var createMealPlanCommand = CreateMealPlanCommandFromResourceAssembler.toCommandFromResource(resource);
+        var mealPlanEntity = this.mealPlanCommandService.handle(createMealPlanCommand);
+        // Validate if meal plan is empty
+        if (mealPlanEntity.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        // Fetch student
-        var getStudentByStudentCodeQuery = new GetStudentByStudentCodeQuery(studentCode);
-        var student = this.studentQueryService.handle(getStudentByStudentCodeQuery);
-        if (student.isEmpty()) {
+        // Fetch meal plan
+        var getMealPlanByIdQuery = new GetMealPlanByIdQuery(mealPlanEntity.get().getId());
+        var mealplan = this.mealPlanQueryService.handle(getMealPlanByIdQuery);
+        if (mealplan.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        // Fetch student resource
-        var studentResource = this.externalProfileService.fetchStudentResourceFromProfileId(student.get()).get();
-        return new ResponseEntity<>(studentResource, HttpStatus.CREATED);
 
-    }*/
+//        var studentResource = this.externalProfileService.fetchStudentResourceFromProfileId(student.get()).get();
+        return new ResponseEntity<>(MealPlanResourceFromEntityAssembler.toResourceFromEntity(mealplan.get()), HttpStatus.CREATED);
+
+    }
     @GetMapping
     public ResponseEntity<List<MealPlanResource>> getAllMealPlans() {
         var getAllMealPlansQuery = new GetAllMealPlanQuery();
@@ -58,7 +61,7 @@ public class MealPlanController {
         return ResponseEntity.ok(
                 mealPlans.stream()
                         .map(MealPlanResourceFromEntityAssembler::toResourceFromEntity)
-                        .collect(Collectors.toList())
+                        .toList()
         );
     }
 
@@ -71,15 +74,14 @@ public class MealPlanController {
         return ResponseEntity.ok(MealPlanResourceFromEntityAssembler.toResourceFromEntity(mealPlanResource.get()));
     }
 
-/*    @PutMapping("/{mealPlanId}")
+    @PutMapping("/{mealPlanId}")
     public ResponseEntity<MealPlanResource> updateStudent(@PathVariable int mealPlanId, @RequestBody MealPlanResource resource) {
-        var updateMealPlanCommand = UpdateStudentCommandFromResourceAssembler.toCommandFromResource(studentCode, resource);
-        var optionalStudent = this.studentCommandService.handle(updateProfileCommand);
-        if (optionalStudent.isEmpty())
+        var updateMealPlanCommand = UpdateMealPlanCommandFromResourceAssembler.toCommandFromResource(resource, mealPlanId);
+        var optionalMealPlan = this.mealPlanCommandService.handle(updateMealPlanCommand);
+        if (optionalMealPlan.isEmpty())
             return ResponseEntity.badRequest().build();
-        var studentResource = this.externalProfileService.fetchStudentResourceFromProfileId(optionalStudent.get()).get();
-        return ResponseEntity.ok(studentResource);
-    }*/
+        return ResponseEntity.ok(MealPlanResourceFromEntityAssembler.toResourceFromEntity(optionalMealPlan.get()));
+    }
 
     @DeleteMapping("/{mealPlanId}")
     public ResponseEntity<?> deleteMealPlan(@PathVariable int mealPlanId) {

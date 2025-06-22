@@ -31,6 +31,10 @@ public class MealPlanType {
         return type.name();
     }
 
+    public static MealPlanType getDefaultMealPlanType() {
+        return new MealPlanType(MealPlanTypes.Breakfast);
+    }
+
     public static MealPlanType toMealPlanTypeFromType(String type) {
         return new MealPlanType(MealPlanTypes.valueOf(type));
     }
