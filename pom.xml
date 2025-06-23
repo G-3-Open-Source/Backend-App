@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pe.edu.upc.center</groupId>
-	<artifactId>backendNutriSmart</artifactId>
+	<artifactId>learning-center-platform-mini</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>backendNutriSmart</name>
-	<description>project for Spring Boot</description>
+	<name>learning-center-platform-mini</name>
+	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -64,6 +64,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/io.github.encryptorcode/pluralize -->
 		<dependency>
 			<groupId>io.github.encryptorcode</groupId>
