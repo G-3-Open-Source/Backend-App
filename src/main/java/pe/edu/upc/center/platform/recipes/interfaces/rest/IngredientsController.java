@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.center.platform.recipes.aplication.internal.commandservices.IngredientCommandServiceImpl;
 import pe.edu.upc.center.platform.recipes.aplication.internal.queryservices.IngredientQueryServiceImpl;
+import pe.edu.upc.center.platform.recipes.domain.model.commands.DeleteIngredientCommand;
 import pe.edu.upc.center.platform.recipes.domain.model.queries.GetAllIngredientsQuery;
 import pe.edu.upc.center.platform.recipes.domain.model.queries.GetIngredientsByIdQuery;
 import pe.edu.upc.center.platform.recipes.interfaces.rest.resources.CreateIngredientResource;
@@ -49,5 +50,12 @@ public class IngredientsController {
         var ingredients = this.ingredientQueryService.handle(getAllIngredientsQuery);
         var ingredientResources = IngredientResourceFromEntityAssembler.toResources(ingredients);
         return ResponseEntity.ok(ingredientResources);
+    }
+
+    @DeleteMapping("/{ingredientId}")
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long ingredientId) {
+        var deleteIngredientCommand = new DeleteIngredientCommand(ingredientId);
+        this.ingredientCommandService.handle(deleteIngredientCommand);
+        return ResponseEntity.noContent().build();
     }
 }

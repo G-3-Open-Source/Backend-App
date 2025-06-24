@@ -9,8 +9,10 @@ import pe.edu.upc.center.platform.recipes.aplication.internal.queryservices.Reci
 import pe.edu.upc.center.platform.recipes.domain.model.commands.DeleteRecipeCommand;
 import pe.edu.upc.center.platform.recipes.domain.model.queries.GetAllRecipesQuery;
 import pe.edu.upc.center.platform.recipes.domain.model.queries.GetRecipesByIdQuery;
+import pe.edu.upc.center.platform.recipes.interfaces.rest.resources.AddIngredientToRecipeResource;
 import pe.edu.upc.center.platform.recipes.interfaces.rest.resources.CreateRecipeResource;
 import pe.edu.upc.center.platform.recipes.interfaces.rest.resources.RecipeResource;
+import pe.edu.upc.center.platform.recipes.interfaces.rest.transform.AddIngredientToRecipeCommandFromResourceAssembler;
 import pe.edu.upc.center.platform.recipes.interfaces.rest.transform.CreateRecipeCommandFromResourceAssembler;
 import pe.edu.upc.center.platform.recipes.interfaces.rest.transform.RecipeResourceFromEntityAssembler;
 import pe.edu.upc.center.platform.recipes.interfaces.rest.transform.UpdateRecipeCommandFromResourceAssembler;
@@ -82,5 +84,20 @@ public class RecipesController {
         var deleteRecipeCommand = new DeleteRecipeCommand(recipeId);
         this.recipeCommandService.handle(deleteRecipeCommand);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{recipeId}/add-ingredient")
+    public ResponseEntity<?> addIngredientToRecipe(
+            @PathVariable Long recipeId,
+            @RequestBody AddIngredientToRecipeResource resource) {
+
+        var command = AddIngredientToRecipeCommandFromResourceAssembler.toCommand(recipeId, resource);
+
+        try {
+            this.recipeCommandService.handle(command);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

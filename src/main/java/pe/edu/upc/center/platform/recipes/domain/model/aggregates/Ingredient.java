@@ -7,6 +7,9 @@ import lombok.ToString;
 import pe.edu.upc.center.platform.recipes.domain.model.valueobjects.MacronutrientValuesId;
 import pe.edu.upc.center.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Entity
 @Table(name = "ingredients")
@@ -37,6 +40,10 @@ public class Ingredient extends AuditableAbstractAggregateRoot<Ingredient> {
     @Embedded
     @AttributeOverride(name = "macronutrientValuesId", column = @Column(name = "macronutrient_values_id", nullable = false))
     private MacronutrientValuesId macronutrientValuesId = new MacronutrientValuesId();
+
+    // 🔗 Relación inversa con Recipe
+    @ManyToMany(mappedBy = "ingredients")
+    private Set<Recipe> recipes = new HashSet<>();
 
     // -----------------------------------
 

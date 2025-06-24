@@ -3,13 +3,15 @@ package pe.edu.upc.center.platform.recipes.infrastructure.persistence.jpa.reposi
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pe.edu.upc.center.platform.recipes.domain.model.entities.FavoriteRecipe;
-import pe.edu.upc.center.platform.recipes.domain.model.valueobjects.UserId;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FavoriteRecipeRepository extends JpaRepository<FavoriteRecipe, Long> {
-    List<FavoriteRecipe> findByUserId(UserId userId);
-    boolean existsByUserIdAndRecipeId(UserId userId, Long recipeId);
-    void deleteByUserIdAndRecipeId(UserId userId, Long recipeId);
+    List<FavoriteRecipe> findByUserId_UserId(Long userId);
+    Optional<FavoriteRecipe> findByUserId_UserIdAndRecipe_Id(Long userId, Long recipeId);
+    boolean existsByUserId_UserIdAndRecipe_Id(Long userId, Long recipeId);
+    void deleteByUserId_UserIdAndRecipe_Id(Long userId, Long recipeId);
+
 }

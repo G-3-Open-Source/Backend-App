@@ -8,6 +8,9 @@ import pe.edu.upc.center.platform.recipes.domain.model.entities.RecipeType;
 import pe.edu.upc.center.platform.recipes.domain.model.valueobjects.UserId;
 import pe.edu.upc.center.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Entity
 @Table(name = "recipes")
@@ -19,19 +22,15 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
     @AttributeOverride(name = "userId", column = @Column(name = "user_id", nullable = false))
     private UserId userId;
 
-    @Getter
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Getter
     @Column(name = "description")
     private String description;
 
-    @Getter
     @Column(name = "preparation_time")
     private int preparationTime;
 
-    @Getter
     @Column(name = "difficulty")
     private String difficulty;
 
@@ -44,10 +43,18 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
     @JoinColumn(name = "recipe_type_id", nullable = false)
     private RecipeType recipeType;
 
-    // -----------------------------------------------------------
+    // 🔗 Relación con Ingredientes
+    @ManyToMany
+    @JoinTable(
+            name = "recipe_ingredients",
+            joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+    )
+    private Set<Ingredient> ingredients = new HashSet<>();
+
     // Constructor vacío requerido por JPA
     public Recipe() {
-        this.userId = new UserId(); // Valor por defecto (0L)
+        this.userId = new UserId();
     }
 
     // Constructor principal usado desde CommandService
@@ -62,7 +69,8 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
         this.recipeType = recipeType;
     }
 
-    public void updateRecipe(String name, String description, int preparationTime, String difficulty, Category category, RecipeType recipeType) {
+    public void updateRecipe(String name, String description, int preparationTime, String difficulty,
+                             Category category, RecipeType recipeType) {
         this.name = name;
         this.description = description;
         this.preparationTime = preparationTime;
@@ -71,8 +79,6 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
         this.recipeType = recipeType;
     }
 
-    // -----------------------------------------------------------
-    // Getter explícito para el Value Object
     public Long getUserId() {
         return this.userId.userId();
     }

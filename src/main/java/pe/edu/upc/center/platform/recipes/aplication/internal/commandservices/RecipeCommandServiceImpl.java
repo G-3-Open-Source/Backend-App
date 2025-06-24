@@ -2,11 +2,13 @@ package pe.edu.upc.center.platform.recipes.aplication.internal.commandservices;
 
 import org.springframework.stereotype.Service;
 import pe.edu.upc.center.platform.recipes.domain.model.aggregates.Recipe;
+import pe.edu.upc.center.platform.recipes.domain.model.commands.AddIngredientToRecipeCommand;
 import pe.edu.upc.center.platform.recipes.domain.model.commands.CreateRecipeCommand;
 import pe.edu.upc.center.platform.recipes.domain.model.commands.DeleteRecipeCommand;
 import pe.edu.upc.center.platform.recipes.domain.model.commands.UpdateRecipeCommand;
 import pe.edu.upc.center.platform.recipes.domain.services.RecipeCommandService;
 import pe.edu.upc.center.platform.recipes.infrastructure.persistence.jpa.repositories.CategoryRepository;
+import pe.edu.upc.center.platform.recipes.infrastructure.persistence.jpa.repositories.IngredientRepository;
 import pe.edu.upc.center.platform.recipes.infrastructure.persistence.jpa.repositories.RecipeRepository;
 import pe.edu.upc.center.platform.recipes.infrastructure.persistence.jpa.repositories.RecipeTypeRepository;
 
@@ -18,11 +20,13 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
     private final RecipeTypeRepository recipeTypeRepository;
+    private final IngredientRepository ingredientRepository;
 
-    public RecipeCommandServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository,  RecipeTypeRepository recipeTypeRepository) {
+    public RecipeCommandServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository,  RecipeTypeRepository recipeTypeRepository, IngredientRepository ingredientRepository) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.recipeTypeRepository = recipeTypeRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
     @Override
@@ -109,4 +113,27 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
             throw new IllegalArgumentException("Error while saving enrollment: " + e.getMessage());
         }
     }
+
+    @Override
+    public void handle(AddIngredientToRecipeCommand command) {
+        var optionalRecipe = recipeRepository.findById(command.recipeId());
+        var optionalIngredient = ingredientRepository.findById(command.ingredientId());
+
+        if (optionalRecipe.isEmpty() || optionalIngredient.isEmpty()) {
+            throw new IllegalArgumentException("Recipe or Ingredient not found.");
+        }
+
+        var recipe = optionalRecipe.get();
+        var ingredient = optionalIngredient.get();
+
+        // Evitar duplicados
+        if (recipe.getIngredients().contains(ingredient)) {
+            throw new IllegalArgumentException("Ingredient already added to the recipe.");
+        }
+
+        recipe.getIngredients().add(ingredient);
+        recipeRepository.save(recipe);
+    }
+
 }
+
