@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "tracking")
 @ToString
-public class Tracking extends AuditableAbstractAggregateRoot<Tracking> {
+public class gitTracking extends AuditableAbstractAggregateRoot<Tracking> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
