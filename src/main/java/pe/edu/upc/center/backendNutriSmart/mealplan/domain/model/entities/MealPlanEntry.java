@@ -19,6 +19,9 @@ public class MealPlanEntry {
     })
     private RecipeId recipeId;
 
+    @Column(name = "day", nullable = false)
+    private int day;
+
     @ManyToOne
     @JoinColumn(name = "meal_plan_type_id", nullable = false)
     private MealPlanType mealPlanType;

@@ -9,7 +9,8 @@ public class UpdateMealPlanEntryCommandFromResourceAssembler {
         return new UpdateMealPlanEntryCommand(
             resource.id(),
                 new RecipeId(resource.recipeId()),
-                Integer.parseInt(resource.mealPlanType()),
+                resource.mealPlanType(),
+                resource.day(),
                 resource.mealPlanId()
         );
     }

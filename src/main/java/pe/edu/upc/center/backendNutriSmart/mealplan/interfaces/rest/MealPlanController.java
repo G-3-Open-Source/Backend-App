@@ -24,7 +24,7 @@ import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.Up
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE })
+@CrossOrigin(origins = "http://localhost:4200", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
 @RequestMapping(value = "/api/v1/meal-plan", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Meal Plan", description = "Meal plans Management Endpoints")

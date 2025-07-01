@@ -4,6 +4,7 @@ import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.valueobjects.Re
 
 public record CreateMealPlanEntryCommand(
         RecipeId recipeId,
+        int day,
         int mealPlanTypeId
 ) {
 }

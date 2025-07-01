@@ -32,18 +32,17 @@ public class MealPlanCommandServiceImpl implements MealPlanCommandService {
     public Optional<MealPlan> handle(CreateMealPlanCommand command) {
         var mealPlan = new MealPlan(command);
 
-        for (var entryCommand : command.entries()) {
-            var mealPlanType = mealPlanTypeRepository.findById(entryCommand.mealPlanTypeId())
-                    .orElseThrow(() -> new RuntimeException("MealPlanType not found"));
-
-            // create MealPlanEntry and associate it with the MealPlan
-            var entry = new MealPlanEntry(
-                    entryCommand.recipeId(),
-                    mealPlanType,
-                    mealPlan
-            );
-            mealPlan.addEntry(entry);
-        }
+        command.entries().stream()
+            .map(entryCommand -> {
+                var mealPlanType = mealPlanTypeRepository.findById(entryCommand.mealPlanTypeId())
+                        .orElseThrow(() -> new RuntimeException("MealPlanType not found"));
+                return new MealPlanEntry(
+                        entryCommand.recipeId(),
+                        mealPlanType,
+                        mealPlan
+                );
+            })
+            .forEach(mealPlan::addEntry);
 
         List<MealPlanTag> tagEntities = command.tags().stream()
                 .map(tagStr -> {

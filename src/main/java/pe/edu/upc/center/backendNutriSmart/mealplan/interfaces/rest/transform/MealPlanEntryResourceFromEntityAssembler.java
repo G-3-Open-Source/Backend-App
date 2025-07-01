@@ -11,7 +11,8 @@ public class MealPlanEntryResourceFromEntityAssembler {
                 .map(entity -> new MealPlanEntryResource(
                         entity.getId(),
                         entity.getRecipeId().recipeId(),
-                        entity.getMealPlanType().getStringType(),
+                        entity.getDay(),
+                        entity.getMealPlanType().getId(),
                         entity.getMealPlan().getId()
                 ))
                 .toList();

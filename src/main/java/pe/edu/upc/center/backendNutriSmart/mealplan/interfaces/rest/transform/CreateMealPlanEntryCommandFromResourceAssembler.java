@@ -8,6 +8,7 @@ public class CreateMealPlanEntryCommandFromResourceAssembler {
     public static CreateMealPlanEntryCommand toCommandFromResource(CreateMealPlanEntryResource resource) {
         return new CreateMealPlanEntryCommand(
                 new RecipeId(resource.recipeId()),
+                resource.day(),
                 resource.mealPlanTypeId()
         );
     }
