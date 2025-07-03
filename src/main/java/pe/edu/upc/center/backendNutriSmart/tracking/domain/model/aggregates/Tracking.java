@@ -24,7 +24,7 @@ public class Tracking extends AuditableAbstractAggregateRoot<Tracking> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "tracking_date", nullable = false)
     private LocalDate date;

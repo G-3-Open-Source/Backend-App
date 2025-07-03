@@ -1,13 +1,13 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl;
 
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.platform.profiles.domain.services.UserCommandService;
-import pe.edu.upc.center.platform.profiles.domain.services.UserQueryService;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.CreateUserCommand;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.CreateUserResource;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.UserResource;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.transform.CreateUserCommandFromResourceAssembler;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.transform.UserResourceFromEntityAssembler;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserCommandService;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserQueryService;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.CreateUserResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.UserResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform.CreateUserCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform.UserResourceFromEntityAssembler;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +30,7 @@ public class UsersContextFacade {
         return queryService.getUserById(id).map(UserResourceFromEntityAssembler::toResourceFromEntity);
     }
 
-    public Long create(CreateUserResource resource) {
+    public int create(CreateUserResource resource) {
         CreateUserCommand command = CreateUserCommandFromResourceAssembler.toCommandFromResource(resource);
         return commandService.handle(command).getId();
     }

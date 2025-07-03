@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MealPlanTypeRepository extends JpaRepository<MealPlanType, Long> {
+public interface TrackingMealPlanTypeRepository extends JpaRepository<MealPlanType, Long> {
     boolean existsByName(MealPlanTypes mealPlanType);
     Optional<MealPlanType> findByName(MealPlanTypes name);
 }

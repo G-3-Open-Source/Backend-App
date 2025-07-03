@@ -2,7 +2,7 @@ package pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pe.edu.upc.center.platform.profiles.domain.model.valueobjects.Ingredient;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.valueobjects.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;

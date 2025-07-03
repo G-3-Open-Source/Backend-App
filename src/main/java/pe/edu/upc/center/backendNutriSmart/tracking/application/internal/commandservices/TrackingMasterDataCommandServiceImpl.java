@@ -5,7 +5,7 @@ import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.Macron
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.SeedTrackingMasterDataCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.MealPlanTypes;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.services.TrackingMasterDataCommandService;
-import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.MealPlanTypeRepository;
+import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.TrackingMealPlanTypeRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.MacronutrientValuesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +17,13 @@ import java.util.List;
 @Service
 public class TrackingMasterDataCommandServiceImpl implements TrackingMasterDataCommandService {
 
-    private final MealPlanTypeRepository mealPlanTypeRepository;
+    private final TrackingMealPlanTypeRepository trackingMealPlanTypeRepository;
     private final MacronutrientValuesRepository macronutrientValuesRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackingMasterDataCommandServiceImpl.class);
 
-    public TrackingMasterDataCommandServiceImpl(MealPlanTypeRepository mealPlanTypeRepository,
+    public TrackingMasterDataCommandServiceImpl(TrackingMealPlanTypeRepository trackingMealPlanTypeRepository,
                                                 MacronutrientValuesRepository macronutrientValuesRepository) {
-        this.mealPlanTypeRepository = mealPlanTypeRepository;
+        this.trackingMealPlanTypeRepository = trackingMealPlanTypeRepository;
         this.macronutrientValuesRepository = macronutrientValuesRepository;
     }
 
@@ -46,9 +46,9 @@ public class TrackingMasterDataCommandServiceImpl implements TrackingMasterDataC
 
         mealPlanTypes.forEach(mealPlanType -> {
             // ALTERNATIVA: Si tu repositorio tiene un método que acepta MealPlanTypes directamente
-            if (!mealPlanTypeRepository.existsByName(mealPlanType)) {
+            if (!trackingMealPlanTypeRepository.existsByName(mealPlanType)) {
                 var mealPlan = new MealPlanType(mealPlanType);
-                mealPlanTypeRepository.save(mealPlan);
+                trackingMealPlanTypeRepository.save(mealPlan);
                 LOGGER.info("Meal plan type {} seeded successfully", mealPlanType.name());
             } else {
                 LOGGER.debug("Meal plan type {} already exists", mealPlanType.name());

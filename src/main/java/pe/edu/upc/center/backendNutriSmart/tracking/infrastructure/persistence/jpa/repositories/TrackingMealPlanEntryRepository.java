@@ -4,9 +4,8 @@ import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPl
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface MealPlanEntryRepository extends JpaRepository<MealPlanEntry, Long> {
+public interface TrackingMealPlanEntryRepository extends JpaRepository<MealPlanEntry, Long> {
 
     List<MealPlanEntry> findAllByTrackingId(Long trackingId);
 }

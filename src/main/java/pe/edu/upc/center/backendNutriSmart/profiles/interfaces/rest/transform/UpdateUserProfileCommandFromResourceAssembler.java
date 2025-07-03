@@ -1,8 +1,8 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform;
 
-import pe.edu.upc.center.platform.profiles.domain.model.commands.UpdateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.UserProfileResource;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.CreateUserProfileResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.UpdateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.UserProfileResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.CreateUserProfileResource;
 public class UpdateUserProfileCommandFromResourceAssembler {
 
     /**

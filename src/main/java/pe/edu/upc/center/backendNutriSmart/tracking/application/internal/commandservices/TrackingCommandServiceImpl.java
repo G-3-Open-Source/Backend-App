@@ -9,7 +9,6 @@ import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.Create
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.CreateTrackingCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.RemoveMealPlanEntryFromTrackingCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.UpdateMealPlanEntryInTrackingCommand;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.MealPlanTypes;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.services.TrackingCommandService;
 import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.*;
 import org.springframework.stereotype.Service;
@@ -20,23 +19,23 @@ import java.util.Optional;
 @Service
 public class TrackingCommandServiceImpl implements TrackingCommandService {
     private final TrackingRepository trackingRepository;
-    private final MealPlanEntryRepository mealPlanEntryRepository;
+    private final TrackingMealPlanEntryRepository trackingMealPlanEntryRepository;
     private final TrackingGoalRepository trackingGoalRepository;
     private final MacronutrientValuesRepository macronutrientValuesRepository;
-    private final MealPlanTypeRepository mealPlanTypeRepository;
+    private final TrackingMealPlanTypeRepository trackingMealPlanTypeRepository;
 
-    public TrackingCommandServiceImpl(TrackingRepository trackingRepository, MealPlanEntryRepository mealPlanEntryRepository,
+    public TrackingCommandServiceImpl(TrackingRepository trackingRepository, TrackingMealPlanEntryRepository trackingMealPlanEntryRepository,
                                       TrackingGoalRepository trackingGoalRepository, MacronutrientValuesRepository macronutrientValuesRepository,
-                                      MealPlanTypeRepository mealPlanTypeRepository) {
+                                      TrackingMealPlanTypeRepository trackingMealPlanTypeRepository) {
         this.trackingRepository = trackingRepository;
-        this.mealPlanEntryRepository = mealPlanEntryRepository;
+        this.trackingMealPlanEntryRepository = trackingMealPlanEntryRepository;
         this.trackingGoalRepository = trackingGoalRepository;
         this.macronutrientValuesRepository = macronutrientValuesRepository;
-        this.mealPlanTypeRepository = mealPlanTypeRepository;
+        this.trackingMealPlanTypeRepository = trackingMealPlanTypeRepository;
     }
 
     @Override
-    public Long handle(CreateMealPlanEntryToTrackingCommand command) {
+    public int handle(CreateMealPlanEntryToTrackingCommand command) {
         // Buscar el tracking por ID de usuario
         Optional<Tracking> trackingOpt = trackingRepository.findByUserId(command.userId());
 
@@ -44,7 +43,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
             throw new IllegalArgumentException("Tracking not found for user: " + command.userId());
         }
 
-        MealPlanType mealPlanType = mealPlanTypeRepository.findByName(command.mealPlanType().getName())
+        MealPlanType mealPlanType = trackingMealPlanTypeRepository.findByName(command.mealPlanType().getName())
                 .orElseThrow(() -> new IllegalArgumentException("Tipo de plan de comida inválido: " + command.mealPlanType()));
 
 
@@ -65,7 +64,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         // NUEVO: Ahora guardar la entry con la FK
         newEntry.setTracking(savedTracking);
-        mealPlanEntryRepository.save(newEntry);
+        trackingMealPlanEntryRepository.save(newEntry);
 
         return savedTracking.getId();
     }
@@ -81,7 +80,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         Tracking tracking = trackingOpt.get();
 
-        Optional<MealPlanEntry> mealPlanEntryOpt = mealPlanEntryRepository.findById(command.MealPlanEntryId());
+        Optional<MealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
 
         if (mealPlanEntryOpt.isEmpty()) {
             throw new IllegalArgumentException("MealPlan not found with id: " + command.MealPlanEntryId());
@@ -110,7 +109,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         Tracking tracking = trackingOpt.get();
 
-        Optional<MealPlanEntry> mealPlanEntryOpt = mealPlanEntryRepository.findById(command.MealPlanEntryId());
+        Optional<MealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
 
         if (mealPlanEntryOpt.isEmpty()) {
             throw new IllegalArgumentException("MealPlan not found with id: " + command.MealPlanEntryId());
@@ -118,12 +117,12 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         MealPlanEntry mealPlanEntry = mealPlanEntryOpt.get();
 
-        MealPlanType mealPlanType = mealPlanTypeRepository.findByName(command.mealPlanType())
+        MealPlanType mealPlanType = trackingMealPlanTypeRepository.findByName(command.mealPlanType())
                 .orElseThrow(() -> new IllegalArgumentException("Tipo de plan de comida inválido: " + command.mealPlanType()));
 
         // Remover el MealPlanEntry de memoria Y de BD
         tracking.removeMealPlanEntry(mealPlanEntry);
-        mealPlanEntryRepository.delete(mealPlanEntry); // NUEVO
+        trackingMealPlanEntryRepository.delete(mealPlanEntry); // NUEVO
 
         // Crear nuevo entry con los datos actualizados
         MealPlanEntry updatedEntry = new MealPlanEntry(
@@ -137,12 +136,12 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
         // NUEVO: Guardar tracking y luego la entry
         Tracking savedTracking = trackingRepository.save(tracking);
         updatedEntry.setTracking(savedTracking);
-        mealPlanEntryRepository.save(updatedEntry);
+        trackingMealPlanEntryRepository.save(updatedEntry);
 
         return Optional.of(savedTracking);
     }
 
-    public Long handle(CreateTrackingCommand command) {
+    public int handle(CreateTrackingCommand command) {
         if(this.trackingRepository.existsByUserId(command.profile())){
             throw new IllegalArgumentException("Tracking already exists for user: " + command.profile());
         }

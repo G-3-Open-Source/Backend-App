@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
-@Entity
+@Entity (name = "Tracking_MealPlanType")
 @Table(name = "mealplan_type")
 @NoArgsConstructor
 @AllArgsConstructor

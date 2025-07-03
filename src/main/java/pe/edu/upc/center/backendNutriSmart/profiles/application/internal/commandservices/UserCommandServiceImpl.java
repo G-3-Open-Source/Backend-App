@@ -2,12 +2,12 @@ package pe.edu.upc.center.backendNutriSmart.profiles.application.internal.comman
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.edu.upc.center.platform.profiles.domain.model.aggregates.User;
-import pe.edu.upc.center.platform.profiles.domain.model.aggregates.UserProfile;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.CreateUserCommand;
-import pe.edu.upc.center.platform.profiles.domain.services.UserCommandService;
-import pe.edu.upc.center.platform.profiles.infrastructure.persistence.jpa.repositories.UserProfileRepository;
-import pe.edu.upc.center.platform.profiles.infrastructure.persistence.jpa.repositories.UserRepository;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.User;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.UserProfile;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserCommandService;
+import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.UserProfileRepository;
+import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.UserRepository;
 
 @Service
 public class UserCommandServiceImpl implements UserCommandService {

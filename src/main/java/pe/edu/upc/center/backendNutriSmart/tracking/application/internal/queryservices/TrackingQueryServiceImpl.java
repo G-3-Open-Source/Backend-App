@@ -8,30 +8,29 @@ import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetCons
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetTrackingByUserIdQuery;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.services.TrackingQueryService;
 import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.MacronutrientValuesRepository;
-import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.MealPlanEntryRepository;
+import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.TrackingMealPlanEntryRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.TrackingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TrackingQueryServiceImpl implements TrackingQueryService {
    private final TrackingRepository trackingRepository;
    private final MacronutrientValuesRepository macronutrientValuesRepository;
-   private final MealPlanEntryRepository mealPlanEntryRepository;
+   private final TrackingMealPlanEntryRepository trackingMealPlanEntryRepository;
 
    public TrackingQueryServiceImpl(TrackingRepository trackingRepository, MacronutrientValuesRepository macronutrientValuesRepository
-   , MealPlanEntryRepository mealPlanEntryRepository) {
+   , TrackingMealPlanEntryRepository trackingMealPlanEntryRepository) {
        this.trackingRepository = trackingRepository;
        this.macronutrientValuesRepository = macronutrientValuesRepository;
-       this.mealPlanEntryRepository = mealPlanEntryRepository;
+       this.trackingMealPlanEntryRepository = trackingMealPlanEntryRepository;
    }
 
     @Override
     public List<MealPlanEntry> handle(GetAllMealsQuery query) {
-        return mealPlanEntryRepository.findAllByTrackingId(query.TrackingId());
+        return trackingMealPlanEntryRepository.findAllByTrackingId(query.TrackingId());
     }
 
     @Override

@@ -3,9 +3,9 @@ package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pe.edu.upc.center.platform.profiles.interfaces.acl.UsersContextFacade;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.CreateUserResource;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.UserResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.UsersContextFacade;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.CreateUserResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.UserResource;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody CreateUserResource r) {
+    public ResponseEntity<Integer> create(@RequestBody CreateUserResource r) {
         var newId = facade.create(r);
         return ResponseEntity.ok(newId);
     }

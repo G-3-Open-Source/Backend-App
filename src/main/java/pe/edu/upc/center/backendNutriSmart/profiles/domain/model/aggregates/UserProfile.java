@@ -3,11 +3,11 @@ package pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.CreateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.Entities.Objective;
-import pe.edu.upc.center.platform.profiles.domain.model.Entities.ActivityLevel;
-import pe.edu.upc.center.platform.profiles.domain.model.Entities.Allergy;
-import pe.edu.upc.center.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Objective;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.ActivityLevel;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Allergy;
+import pe.edu.upc.center.backendNutriSmart.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 import java.util.ArrayList;
 import java.util.List;

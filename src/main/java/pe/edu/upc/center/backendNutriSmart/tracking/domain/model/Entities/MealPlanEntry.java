@@ -15,8 +15,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "meal_plan_entry")
+@Entity(name = "TrackingMealPlanEntry")
+@Table(name = "tracking_meal_plan_entry")
 public class MealPlanEntry extends AuditableModel {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

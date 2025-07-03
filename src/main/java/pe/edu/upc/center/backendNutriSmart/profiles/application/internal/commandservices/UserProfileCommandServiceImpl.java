@@ -1,12 +1,12 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.application.internal.commandservices;
 
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.platform.profiles.domain.model.aggregates.UserProfile;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.CreateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.DeleteUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.UpdateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.services.UserProfileCommandService;
-import pe.edu.upc.center.platform.profiles.infrastructure.persistence.jpa.repositories.*;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.UserProfile;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.DeleteUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.UpdateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserProfileCommandService;
+import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.*;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class UserProfileCommandServiceImpl implements UserProfileCommandService 
     }
 
     @Override
-    public Long handle(CreateUserProfileCommand command) {
+    public int handle(CreateUserProfileCommand command) {
         var activityLevel = activityLevelRepository.findById(command.activityLevelId())
                 .orElseThrow(() -> new IllegalArgumentException("Activity level not found"));
 

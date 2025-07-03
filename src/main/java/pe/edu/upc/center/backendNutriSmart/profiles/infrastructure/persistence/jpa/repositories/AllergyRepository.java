@@ -2,7 +2,7 @@ package pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pe.edu.upc.center.platform.profiles.domain.model.Entities.Allergy;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Allergy;
 
 import java.util.List;
 import java.util.Optional;

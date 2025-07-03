@@ -1,11 +1,11 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.application.internal.queryservices;
 
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.platform.profiles.domain.model.aggregates.UserProfile;
-import pe.edu.upc.center.platform.profiles.domain.model.queries.GetAllUserProfilesQuery;
-import pe.edu.upc.center.platform.profiles.domain.model.queries.GetUserProfileByIdQuery;
-import pe.edu.upc.center.platform.profiles.domain.services.UserProfileQueryService;
-import pe.edu.upc.center.platform.profiles.infrastructure.persistence.jpa.repositories.UserProfileRepository;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.UserProfile;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.queries.GetAllUserProfilesQuery;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.queries.GetUserProfileByIdQuery;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserProfileQueryService;
+import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.UserProfileRepository;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,8 +1,8 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest;
 
 import org.springframework.web.bind.annotation.*;
-import pe.edu.upc.center.platform.profiles.domain.model.Entities.Objective;
-import pe.edu.upc.center.platform.profiles.infrastructure.persistence.jpa.repositories.ObjectiveRepository;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Objective;
+import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.ObjectiveRepository;
 
 import java.util.List;
 

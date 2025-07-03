@@ -1,8 +1,8 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest;
 
 import org.springframework.web.bind.annotation.*;
-import pe.edu.upc.center.platform.profiles.domain.model.Entities.Allergy;
-import pe.edu.upc.center.platform.profiles.infrastructure.persistence.jpa.repositories.AllergyRepository;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Allergy;
+import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.AllergyRepository;
 
 import java.util.List;
 

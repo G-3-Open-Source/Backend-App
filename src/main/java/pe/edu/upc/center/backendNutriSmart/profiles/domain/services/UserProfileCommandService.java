@@ -1,15 +1,15 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.domain.services;
 
-import pe.edu.upc.center.platform.profiles.domain.model.aggregates.UserProfile;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.CreateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.DeleteUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.UpdateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.UserProfile;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.DeleteUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.UpdateUserProfileCommand;
 
 import java.util.Optional;
 
 
 public interface UserProfileCommandService {
-    Long handle(CreateUserProfileCommand command);
+    int handle(CreateUserProfileCommand command);
 
     Optional<UserProfile> handle(UpdateUserProfileCommand command);
 

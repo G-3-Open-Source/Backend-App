@@ -1,18 +1,18 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl;
 
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.CreateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.DeleteUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.commands.UpdateUserProfileCommand;
-import pe.edu.upc.center.platform.profiles.domain.model.queries.GetAllUserProfilesQuery;
-import pe.edu.upc.center.platform.profiles.domain.model.queries.GetUserProfileByIdQuery;
-import pe.edu.upc.center.platform.profiles.domain.services.UserProfileCommandService;
-import pe.edu.upc.center.platform.profiles.domain.services.UserProfileQueryService;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.CreateUserProfileResource;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.resources.UserProfileResource;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.transform.CreateUserProfileCommandFromResourceAssembler;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.transform.UpdateUserProfileCommandFromResourceAssembler;
-import pe.edu.upc.center.platform.profiles.interfaces.rest.transform.UserProfileResourceFromEntityAssembler;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.DeleteUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.UpdateUserProfileCommand;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.queries.GetAllUserProfilesQuery;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.queries.GetUserProfileByIdQuery;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserProfileCommandService;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserProfileQueryService;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.CreateUserProfileResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.UserProfileResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform.CreateUserProfileCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform.UpdateUserProfileCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform.UserProfileResourceFromEntityAssembler;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,7 @@ public class UserProfilesContextFacade {
                 .map(UserProfileResourceFromEntityAssembler::toResourceFromEntity);
     }
 
-    public Long create(CreateUserProfileResource resource) {
+    public int create(CreateUserProfileResource resource) {
         CreateUserProfileCommand cmd = CreateUserProfileCommandFromResourceAssembler.toCommandFromResource(resource);
         return commandService.handle(cmd);
     }

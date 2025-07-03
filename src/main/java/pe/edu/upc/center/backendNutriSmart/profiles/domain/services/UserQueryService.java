@@ -1,6 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.domain.services;
 
-import pe.edu.upc.center.platform.profiles.domain.model.aggregates.User;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.User;
 
 import java.util.List;
 import java.util.Optional;

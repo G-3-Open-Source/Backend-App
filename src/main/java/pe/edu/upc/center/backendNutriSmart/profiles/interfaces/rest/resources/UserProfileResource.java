@@ -3,7 +3,7 @@ import lombok.Getter;
 
 import java.util.List;
 public record UserProfileResource(
-        Long id,
+        int id,
         String gender,
         double height,
         double weight,
@@ -16,7 +16,7 @@ public record UserProfileResource(
 ) {
 
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 }
