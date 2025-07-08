@@ -39,12 +39,12 @@ public class UserProfile extends AuditableAbstractAggregateRoot<UserProfile> {
 
     // Relaciones con entidades
     @Getter
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "activity_level_id", nullable = false)
     private ActivityLevel activityLevel;
 
     @Getter
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "objective_id", nullable = false)
     private Objective objective;
 

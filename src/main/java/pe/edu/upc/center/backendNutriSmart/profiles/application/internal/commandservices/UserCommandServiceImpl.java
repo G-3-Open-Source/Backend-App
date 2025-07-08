@@ -15,16 +15,30 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
 
-    public UserCommandServiceImpl(UserRepository userRepository, UserProfileRepository userProfileRepository) {
-        this.userRepository = userRepository;
+    public UserCommandServiceImpl(UserRepository userRepository,
+                                  UserProfileRepository userProfileRepository) {
+        this.userRepository        = userRepository;
         this.userProfileRepository = userProfileRepository;
     }
 
     @Override
     @Transactional
     public User handle(CreateUserCommand command) {
-        UserProfile userProfile = userProfileRepository.findById(command.userProfileId())
-                .orElseThrow(() -> new IllegalArgumentException("UserProfile no encontrado con id: " + command.userProfileId()));
+        UserProfile userProfile;
+
+        if (command.userProfileId() != null) {
+            // viene perfil explícito
+            userProfile = userProfileRepository.findById(command.userProfileId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "UserProfile no encontrado con id: " + command.userProfileId()
+                    ));
+        } else {
+            // NO vino id → tomamos el último perfil creado
+            userProfile = userProfileRepository.findTopByOrderByIdDesc()
+                    .orElseThrow(() -> new IllegalStateException(
+                            "No hay perfiles en la base de datos para asociar"
+                    ));
+        }
 
         User user = new User(
                 command.name(),
