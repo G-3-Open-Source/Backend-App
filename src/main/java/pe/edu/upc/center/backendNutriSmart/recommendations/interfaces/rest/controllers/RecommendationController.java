@@ -13,8 +13,11 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.Recom
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationQueryService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.AssignRecommendationResource;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.CreateRecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.RecommendationResource;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.UpdateRecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.AssignRecommendationCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.CreateRecommendationCommandFromResourceAssembler;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.RecommendationResourceFromEntityAssembler;
 
 import java.util.List;
@@ -85,6 +88,24 @@ public class RecommendationController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    @PostMapping("/base")
+    public ResponseEntity<RecommendationResource> createBaseRecommendation(@RequestBody CreateRecommendationResource resource) {
+        try {
+            var command = CreateRecommendationCommandFromResourceAssembler.toCommandFromResource(resource);
+            int recommendationId = commandService.handle(command);
+
+            Recommendation created = recommendationRepository.findById((long) recommendationId)
+                    .orElseThrow(() -> new RuntimeException("Recommendation not found after creation"));
+
+            RecommendationResource responseResource = RecommendationResourceFromEntityAssembler.toResourceFromEntity(created);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseResource);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     // ✅ 3. OBTENER RECOMMENDATIONS POR USUARIO
     @GetMapping("/user/{userId}")
@@ -128,6 +149,23 @@ public class RecommendationController {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(resources);
 
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    @PutMapping("/{recommendationId}")
+    public ResponseEntity<RecommendationResource> updateRecommendation(
+            @PathVariable Long recommendationId,
+            @RequestBody UpdateRecommendationResource resource) {
+        try {
+            Recommendation updated = commandService.handleUpdate(recommendationId, resource);
+            RecommendationResource response = RecommendationResourceFromEntityAssembler.toResourceFromEntity(updated);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
