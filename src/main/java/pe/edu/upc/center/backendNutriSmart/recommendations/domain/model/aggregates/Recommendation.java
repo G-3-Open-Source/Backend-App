@@ -2,8 +2,8 @@ package pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.aggrega
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.RecommendationStatus;
@@ -13,53 +13,69 @@ import pe.edu.upc.center.backendNutriSmart.shared.domain.model.aggregates.Audita
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "recommendations")
-@NoArgsConstructor
 public class Recommendation extends AuditableAbstractAggregateRoot<Recommendation> {
 
-    @Getter
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "value", column = @Column(name = "user_id", nullable = true)) // ← nullable = true
+    })
+    // Eliminar @NotNull para permitir recommendations sin asignar
     private UserId userId;
 
-    @Getter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "template_id", nullable = false)
     @JsonBackReference
+    @NotNull(message = "El template no puede ser nulo")
     private RecommendationTemplate template;
 
-    @Setter
-    @Getter
-    @Column(nullable = false)
+    @Column(name = "reason", nullable = false)
+    @NotBlank(message = "La razón no puede estar vacía")
+    @Size(max = 255, message = "La razón no puede exceder los 255 caracteres")
     private String reason;
 
-    @Setter
-    @Getter
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "notes", nullable = false, columnDefinition = "TEXT")
+    @NotBlank(message = "Las notas no pueden estar vacías")
     private String notes;
 
-    @Setter
-    @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "time_of_day", nullable = false)
+    @NotNull(message = "El momento del día no puede ser nulo")
     private TimeOfDay timeOfDay;
 
-    @Setter
-    @Getter
-    @Column(nullable = false)
+    @Column(name = "score", nullable = false)
+    @NotNull(message = "El puntaje no puede ser nulo")
+    @DecimalMin(value = "0.0", inclusive = true, message = "El puntaje debe ser mayor o igual a 0")
+    @DecimalMax(value = "10.0", inclusive = true, message = "El puntaje debe ser menor o igual a 10")
     private Double score;
 
-    @Setter
-    @Getter
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
+    @NotNull(message = "El estado no puede ser nulo")
     private RecommendationStatus status;
 
-    @Getter
-    @Column(name = "assigned_at", nullable = false)
+    @Column(name = "assigned_at", nullable = true) // ← nullable = true
     private LocalDateTime assignedAt;
 
-    // ------------------ Constructor privado ------------------
+    public Recommendation() {}
+
+    // Constructor para crear recommendation SIN ASIGNAR
+    public Recommendation(RecommendationTemplate template, String reason, String notes,
+                          TimeOfDay timeOfDay, Double score, RecommendationStatus status) {
+        this.userId = null; // Sin usuario asignado
+        this.template = template;
+        this.reason = reason;
+        this.notes = notes;
+        this.timeOfDay = timeOfDay;
+        this.score = score;
+        this.status = status;
+        this.assignedAt = null; // Sin fecha de asignación
+    }
+
+    // Constructor para crear recommendation ASIGNADA
     private Recommendation(UserId userId, RecommendationTemplate template, String reason, String notes,
                            TimeOfDay timeOfDay, Double score, RecommendationStatus status) {
         this.userId = userId;
@@ -72,7 +88,7 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
         this.assignedAt = LocalDateTime.now();
     }
 
-    // ------------------ Método de creación ------------------
+    // Factory method para asignar recommendation a usuario
     public static Recommendation assignToUser(UserId userId, Long templateId, String reason, String notes,
                                               TimeOfDay timeOfDay, Double score, RecommendationStatus status) {
         RecommendationTemplate template = new RecommendationTemplate();
@@ -80,13 +96,45 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
         return new Recommendation(userId, template, reason, notes, timeOfDay, score, status);
     }
 
-    // ------------------ Lógica de desactivación ------------------
+    // Método para asignar recommendation existente a usuario
+    public void assignToUser(Long userId) {
+        this.userId = new UserId(userId);
+        this.assignedAt = LocalDateTime.now();
+        this.status = RecommendationStatus.ACTIVE;
+    }
+
+    public void activate() {
+        this.status = RecommendationStatus.ACTIVE;
+    }
+
     public void deactivate() {
         this.status = RecommendationStatus.INACTIVE;
+    }
+
+    public void complete() {
+        this.status = RecommendationStatus.INACTIVE;
+    }
+
+    public boolean isActive() {
+        return this.status == RecommendationStatus.ACTIVE;
+    }
+
+    public boolean isCompleted() {
+        return this.status == RecommendationStatus.INACTIVE;
     }
 
     public Long getTemplateId() {
         return template != null ? template.getId() : null;
     }
 
+    public void updateScore(Double newScore) {
+        if (newScore >= 0.0 && newScore <= 10.0) {
+            this.score = newScore;
+        }
+    }
+
+    // Verificar si la recommendation está asignada
+    public boolean isAssigned() {
+        return this.userId != null && this.userId.getValue() != null;
+    }
 }

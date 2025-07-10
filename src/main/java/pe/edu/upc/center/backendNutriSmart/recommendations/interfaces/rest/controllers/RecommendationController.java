@@ -1,22 +1,21 @@
 package pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.controllers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.aggregates.Recommendation;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationCommandService;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationQueryService;
-import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AssignRecommendationCommand;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.DeleteRecommendationCommand;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.queries.GetRecommendationsByUserQuery;
-import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.AssignRecommendationResource;
-import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.RecommendationResource;
-import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.UpdateRecommendationResource;
-import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.AssignRecommendationCommandFromResourceAssembler;
-import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.RecommendationResourceFromEntityAssembler;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.aggregates.Recommendation;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AssignRecommendationCommand;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AutoAssignRecommendationsCommand;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.DeleteRecommendationCommand;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.queries.GetRecommendationsByUserQuery;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationCommandService;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationQueryService;
+import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.AssignRecommendationResource;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.RecommendationResource;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.AssignRecommendationCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.RecommendationResourceFromEntityAssembler;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,49 +38,98 @@ public class RecommendationController {
         this.recommendationRepository = recommendationRepository;
     }
 
-    @PostMapping
-    public ResponseEntity<RecommendationResource> assignRecommendation(@RequestBody AssignRecommendationResource resource) {
-        AssignRecommendationCommand command = AssignRecommendationCommandFromResourceAssembler.toCommandFromResource(resource);
-        int recommendationId = commandService.handle(command);
-        GetRecommendationsByUserQuery query = new GetRecommendationsByUserQuery(command.userId());
+    // ✅ 1. AUTO-ASIGNAR RECOMMENDATIONS (endpoint principal)
+    @PostMapping("/auto-assign/{userId}")
+    public ResponseEntity<List<RecommendationResource>> autoAssignRecommendations(@PathVariable Long userId) {
+        try {
+            AutoAssignRecommendationsCommand command = new AutoAssignRecommendationsCommand(userId);
+            List<Recommendation> assignedRecommendations = commandService.handleAutoAssign(command);
 
-        return queryService.handle(query).stream()
-                .filter(r -> r.getId() == recommendationId)
-                .findFirst()
-                .map(value -> new ResponseEntity<>(
-                        RecommendationResourceFromEntityAssembler.toResourceFromEntity(value),
-                        HttpStatus.CREATED))
-                .orElse(ResponseEntity.badRequest().build());
+            List<RecommendationResource> resources = assignedRecommendations.stream()
+                    .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(resources);
+
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("User profile not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
+    // ✅ 2. ASIGNAR RECOMMENDATION ESPECÍFICA
+    @PostMapping("/assign")
+    public ResponseEntity<RecommendationResource> assignSpecificRecommendation(@RequestBody AssignRecommendationResource resource) {
+        try {
+            AssignRecommendationCommand command = AssignRecommendationCommandFromResourceAssembler.toCommandFromResource(resource);
+            int recommendationId = commandService.handle(command);
+
+            return queryService.handle(new GetRecommendationsByUserQuery(command.userId()))
+                    .stream()
+                    .filter(rec -> rec.getId() == recommendationId)
+                    .findFirst()
+                    .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
+                    .map(responseResource -> ResponseEntity.status(HttpStatus.CREATED).body(responseResource))
+                    .orElse(ResponseEntity.notFound().build());
+
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("User profile not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // ✅ 3. OBTENER RECOMMENDATIONS POR USUARIO
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<RecommendationResource>> getUserRecommendations(@PathVariable Long userId) {
+        try {
+            List<Recommendation> recommendations = queryService.handle(new GetRecommendationsByUserQuery(userId));
+            List<RecommendationResource> resources = recommendations.stream()
+                    .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(resources);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // ✅ 4. ELIMINAR RECOMMENDATION
     @DeleteMapping("/{recommendationId}")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long recommendationId) {
-        commandService.handle(new DeleteRecommendationCommand(recommendationId));
-        return ResponseEntity.noContent().build();
+        try {
+            commandService.handle(new DeleteRecommendationCommand(recommendationId));
+            return ResponseEntity.noContent().build();
+
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<RecommendationResource>> getRecommendationsByUser(@PathVariable Long userId) {
-        List<Recommendation> recommendations = queryService.handle(new GetRecommendationsByUserQuery(userId));
-        List<RecommendationResource> resources = recommendations.stream()
-                .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resources);
-    }
+    // ✅ 5. OBTENER TODAS LAS RECOMMENDATIONS (admin)
+    @GetMapping
+    public ResponseEntity<List<RecommendationResource>> getAllRecommendations() {
+        try {
+            List<Recommendation> recommendations = recommendationRepository.findAll();
+            List<RecommendationResource> resources = recommendations.stream()
+                    .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(resources);
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Recommendation> updateRecommendation(
-            @PathVariable Long id,
-            @RequestBody UpdateRecommendationResource resource) {
-
-        return recommendationRepository.findById(id).map(existing -> {
-            existing.setReason(resource.reason());
-            existing.setNotes(resource.notes());
-            existing.setTimeOfDay(resource.timeOfDay());
-            existing.setScore(resource.score());
-            existing.setStatus(resource.status());
-            Recommendation updated = recommendationRepository.save(existing);
-            return ResponseEntity.ok(updated);
-        }).orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

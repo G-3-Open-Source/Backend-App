@@ -26,13 +26,16 @@ public class RecommendationTemplate {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
+    private String category; // Nuevo campo
+
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Recommendation> recommendations;
 
-    // ✅ Constructor personalizado para crear desde el controller
-    public RecommendationTemplate(String title, String content) {
+    public RecommendationTemplate(String title, String content, String category) {
         this.title = title;
         this.content = content;
+        this.category = category;
     }
 }

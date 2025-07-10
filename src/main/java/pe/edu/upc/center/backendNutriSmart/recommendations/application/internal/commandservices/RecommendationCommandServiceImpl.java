@@ -1,25 +1,70 @@
 package pe.edu.upc.center.backendNutriSmart.recommendations.application.internal.commandservices;
 
 import org.springframework.stereotype.Service;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.UserProfilesContextFacade;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.aggregates.Recommendation;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AssignRecommendationCommand;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AutoAssignRecommendationsCommand;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.CreateRecommendationCommand;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.DeleteRecommendationCommand;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.UserId;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationCommandService;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationTemplateService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.RecommendationStatus;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RecommendationCommandServiceImpl implements RecommendationCommandService {
 
     private final RecommendationRepository recommendationRepository;
+    private final RecommendationTemplateService templateService;
+    private final UserProfilesContextFacade userProfilesACL;
 
-    public RecommendationCommandServiceImpl(RecommendationRepository recommendationRepository) {
+    public RecommendationCommandServiceImpl(
+            RecommendationRepository recommendationRepository,
+            RecommendationTemplateService templateService,
+            UserProfilesContextFacade userProfilesACL) {
         this.recommendationRepository = recommendationRepository;
+        this.templateService = templateService;
+        this.userProfilesACL = userProfilesACL;
+    }
+
+    @Override
+    public int handle(CreateRecommendationCommand command) {
+        Optional<RecommendationTemplate> templateOpt = templateService.findById(command.templateId());
+        if (templateOpt.isEmpty()) {
+            throw new RuntimeException("Template not found: " + command.templateId());
+        }
+
+        Recommendation baseRecommendation = new Recommendation(
+                templateOpt.get(),
+                command.reason(),
+                command.notes(),
+                command.timeOfDay(),
+                command.score(),
+                command.status()
+        );
+
+        Recommendation savedRecommendation = recommendationRepository.save(baseRecommendation);
+        return Math.toIntExact(savedRecommendation.getId());
     }
 
     @Override
     public int handle(AssignRecommendationCommand command) {
-        var recommendation = Recommendation.assignToUser(
+        validateUserExists(command.userId());
+
+        Optional<RecommendationTemplate> templateOpt = templateService.findById(command.templateId());
+        if (templateOpt.isEmpty()) {
+            throw new RuntimeException("Template not found: " + command.templateId());
+        }
+
+        // ✅ CREAR RECOMMENDATION ASIGNADA DIRECTAMENTE
+        Recommendation assignedRecommendation = Recommendation.assignToUser(
                 new UserId(command.userId()),
                 command.templateId(),
                 command.reason(),
@@ -29,16 +74,57 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
                 command.status()
         );
 
-        recommendationRepository.save(recommendation);
-        return recommendation.getId();
+        Recommendation saved = recommendationRepository.save(assignedRecommendation);
+        return Math.toIntExact(saved.getId());
+    }
+
+    @Override
+    public List<Recommendation> handleAutoAssign(AutoAssignRecommendationsCommand command) {
+        // ✅ VALIDAR USUARIO EXISTE EN PROFILES BC
+        validateUserExists(command.userId());
+
+        // ✅ OBTENER RECOMMENDATIONS BASE DISPONIBLES
+        List<Recommendation> baseRecommendations = recommendationRepository.findByUserIdIsNull();
+
+        if (baseRecommendations.isEmpty()) {
+            throw new RuntimeException("No hay recommendations BASE disponibles para auto-asignar");
+        }
+
+        // ✅ CREAR COPIAS ASIGNADAS AL USUARIO (límite de 3)
+        List<Recommendation> assignedRecommendations = baseRecommendations.stream()
+                .limit(3)
+                .map(base -> createAssignedCopy(base, command.userId()))
+                .collect(Collectors.toList());
+
+        return recommendationRepository.saveAll(assignedRecommendations);
     }
 
     @Override
     public void handle(DeleteRecommendationCommand command) {
-        var recommendation = recommendationRepository.findById(command.recommendationId())
-                .orElseThrow(() -> new IllegalArgumentException("Recommendation not found"));
+        // ✅ VALIDAR RECOMMENDATION EXISTE
+        Recommendation recommendation = recommendationRepository.findById(command.recommendationId())
+                .orElseThrow(() -> new RuntimeException("Recommendation not found: " + command.recommendationId()));
 
-        recommendation.deactivate(); // cambia el estado a INACTIVE
-        recommendationRepository.save(recommendation); // guarda el cambio
+        // ✅ ELIMINAR RECOMMENDATION
+        recommendationRepository.delete(recommendation);
+    }
+
+    // ✅ MÉTODO PRIVADO PARA VALIDACIÓN ACL
+    private void validateUserExists(Long userId) {
+        userProfilesACL.fetchById(userId)
+                .orElseThrow(() -> new RuntimeException("User profile not found: " + userId));
+    }
+
+    // ✅ MÉTODO PRIVADO PARA CREAR COPIA ASIGNADA
+    private Recommendation createAssignedCopy(Recommendation base, Long userId) {
+        return Recommendation.assignToUser(
+                new UserId(userId),
+                base.getTemplateId(),
+                base.getReason(),
+                base.getNotes(),
+                base.getTimeOfDay(),
+                base.getScore(),
+                RecommendationStatus.ACTIVE // Activo al asignar
+        );
     }
 }
