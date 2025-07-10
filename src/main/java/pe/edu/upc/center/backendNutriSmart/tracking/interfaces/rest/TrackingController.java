@@ -62,7 +62,7 @@ public class TrackingController {
         var createTrackingCommand = CreateTrackingCommandFromResourceAssembler.toCommand(resource);
         var trackingId = this.trackingCommandService.handle(createTrackingCommand);
 
-        if (trackingId == 0) {
+        if (trackingId == 0L) {
             return ResponseEntity.badRequest().build();
         }
 

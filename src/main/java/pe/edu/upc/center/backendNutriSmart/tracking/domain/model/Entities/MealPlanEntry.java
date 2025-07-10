@@ -15,7 +15,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name = "TrackingMealPlanEntry")
+@Entity
 @Table(name = "tracking_meal_plan_entry")
 public class MealPlanEntry extends AuditableModel {
   @Id

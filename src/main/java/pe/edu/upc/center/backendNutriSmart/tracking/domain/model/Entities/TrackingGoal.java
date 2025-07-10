@@ -1,6 +1,7 @@
 package pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities;
 
 
+import lombok.Setter;
 import pe.edu.upc.center.backendNutriSmart.shared.domain.model.entities.AuditableModel;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.UserId;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Profile;
 public class TrackingGoal extends AuditableModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter
     private Long id;
 
     @NotNull
@@ -23,6 +25,7 @@ public class TrackingGoal extends AuditableModel {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "target_macros")
+    @Setter
     private MacronutrientValues targetMacros;
 
 
@@ -32,5 +35,10 @@ public class TrackingGoal extends AuditableModel {
     public TrackingGoal(UserId userId, MacronutrientValues targetMacros) {
         this.userId = userId;
         this.targetMacros = targetMacros;
+    }
+
+    // Método para actualizar los macros del objetivo
+    public void updateTargetMacros(MacronutrientValues newTargetMacros) {
+        this.targetMacros = newTargetMacros;
     }
 }

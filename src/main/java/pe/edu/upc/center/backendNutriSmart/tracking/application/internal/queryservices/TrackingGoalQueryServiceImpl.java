@@ -34,3 +34,4 @@ public class TrackingGoalQueryServiceImpl implements TrackingGoalQueryService {
         return Optional.empty();
     }
 }
+

@@ -1,6 +1,8 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl;
 
 import org.springframework.stereotype.Service;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Objective;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.UserProfile;
 import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.CreateUserProfileCommand;
 import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.DeleteUserProfileCommand;
 import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.commands.UpdateUserProfileCommand;
@@ -37,6 +39,44 @@ public class UserProfilesContextFacade {
     public Optional<UserProfileResource> fetchById(Long id) {
         return queryService.handle(new GetUserProfileByIdQuery(id))
                 .map(UserProfileResourceFromEntityAssembler::toResourceFromEntity);
+    }
+
+    /**
+     * Obtiene el objetivo de un perfil de usuario por su ID
+     * @param profileId ID del perfil
+     * @return Optional con el objetivo del perfil si existe
+     */
+    public Optional<Objective> fetchObjectiveByProfileId(Long profileId) {
+        return queryService.handle(new GetUserProfileByIdQuery(profileId))
+                .map(UserProfile::getObjective);
+    }
+
+    /**
+     * Obtiene el nombre del objetivo de un perfil de usuario
+     * @param profileId ID del perfil
+     * @return Optional con el nombre del objetivo si existe
+     */
+    public Optional<String> fetchObjectiveNameByProfileId(Long profileId) {
+        return fetchObjectiveByProfileId(profileId)
+                .map(Objective::getObjectiveName);
+    }
+
+    /**
+     * Verifica si un perfil existe
+     * @param profileId ID del perfil
+     * @return true si el perfil existe, false en caso contrario
+     */
+    public boolean existsProfileById(Long profileId) {
+        return queryService.handle(new GetUserProfileByIdQuery(profileId)).isPresent();
+    }
+
+    /**
+     * Obtiene el UserProfile completo por ID (para uso interno del facade)
+     * @param profileId ID del perfil
+     * @return Optional con el UserProfile si existe
+     */
+    public Optional<UserProfile> fetchUserProfileById(Long profileId) {
+        return queryService.handle(new GetUserProfileByIdQuery(profileId));
     }
 
     public int create(CreateUserProfileResource resource) {

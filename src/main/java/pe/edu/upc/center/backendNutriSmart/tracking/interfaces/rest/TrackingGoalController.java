@@ -4,11 +4,12 @@ import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.command
 import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.commandservices.TrackingGoalCommandServiceImpl;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.CreateMacronutrientValuesCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.CreateTrackingGoalCommand;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.UpdateTrackingGoalCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetTargetMacronutrientsQuery;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.GoalTypes;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.UserId;
 import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.MacronutrientValuesRepository;
-import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.resources.CreateTrackingGoalResource;
-import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.resources.MacronutrientValuesResource;
+import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.resources.*;
 import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.transform.MacronutrientValuesResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,8 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetTrackingGoalByUserIdQuery;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.services.TrackingGoalQueryService;
-import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.resources.TrackingGoalResource;
 import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.transform.TrackingGoalResourceFromEntityAssembler;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/tracking-goals", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,14 +36,76 @@ public class TrackingGoalController {
     private final TrackingGoalCommandServiceImpl trackingGoalCommandService;
     private final MacronutrientValuesRepository macronutrientValuesRepository;
 
-
-    public TrackingGoalController(TrackingGoalQueryService trackingGoalQueryService,  MacronutrientValuesCommandServiceImpl macronutrientValuesCommandService,
+    public TrackingGoalController(TrackingGoalQueryService trackingGoalQueryService,
+                                  MacronutrientValuesCommandServiceImpl macronutrientValuesCommandService,
                                   TrackingGoalCommandServiceImpl trackingGoalCommandService,
                                   MacronutrientValuesRepository macronutrientValuesRepository) {
         this.trackingGoalQueryService = trackingGoalQueryService;
         this.macronutrientValuesCommandService = macronutrientValuesCommandService;
         this.trackingGoalCommandService = trackingGoalCommandService;
         this.macronutrientValuesRepository = macronutrientValuesRepository;
+    }
+
+    @Operation(
+            summary = "Get all available goal types",
+            description = "Fetch all available goal types with their macronutrient values",
+            operationId = "getGoalTypes",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successful operation",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = GoalTypeResource.class)
+                            )
+                    )
+            }
+    )
+    @GetMapping("/goal-types")
+    public ResponseEntity<List<GoalTypeResource>> getGoalTypes() {
+        List<GoalTypeResource> goalTypes = Arrays.stream(GoalTypes.values())
+                .map(GoalTypeResource::from)
+                .toList();
+        return ResponseEntity.ok(goalTypes);
+    }
+
+    @Operation(
+            summary = "Update tracking goal by user ID",
+            description = "Update the tracking goal and macronutrient targets for a specific user",
+            operationId = "updateTrackingGoalByUserId",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Tracking goal updated successfully"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Tracking goal not found for user"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid input data"
+                    )
+            }
+    )
+    @PutMapping("/user/{userId}")
+    public ResponseEntity<Void> updateTrackingGoalByUserId(
+            @PathVariable Long userId,
+            @RequestBody UpdateTrackingGoalResource resource) {
+
+        try {
+            var updateCommand = new UpdateTrackingGoalCommand(
+                    new UserId(userId),
+                    resource.goalType()
+            );
+
+            trackingGoalCommandService.handle(updateCommand);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(
@@ -75,7 +140,6 @@ public class TrackingGoalController {
         return ResponseEntity.ok(trackingGoalResource);
     }
 
-    // AGREGA ESTE NUEVO MÉTODO:
     @Operation(
             summary = "Get target macronutrients by tracking goal ID",
             description = "Fetch target macronutrients for a specific tracking goal",
@@ -86,7 +150,7 @@ public class TrackingGoalController {
                             description = "Successful operation",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = MacronutrientValuesResource.class) // Necesitarás crear este Resource
+                                    schema = @Schema(implementation = MacronutrientValuesResource.class)
                             )
                     ),
                     @ApiResponse(
@@ -104,7 +168,7 @@ public class TrackingGoalController {
             return ResponseEntity.notFound().build();
         }
 
-        var macronutrientsResource = MacronutrientValuesResourceFromEntityAssembler.toResource(optionalMacros.get()); // Necesitarás crear este Assembler
+        var macronutrientsResource = MacronutrientValuesResourceFromEntityAssembler.toResource(optionalMacros.get());
         return ResponseEntity.ok(macronutrientsResource);
     }
 
@@ -121,20 +185,18 @@ public class TrackingGoalController {
         var userId = new UserId(resource.userId());
 
         var createMacroCommand = new CreateMacronutrientValuesCommand(
-                null, // ID es generado
+                null,
                 resource.targetMacros().calories(),
                 resource.targetMacros().carbs(),
                 resource.targetMacros().proteins(),
                 resource.targetMacros().fats()
         );
 
-        // Guardar los valores de macronutrientes
         Long macroId = macronutrientValuesCommandService.handle(createMacroCommand);
 
-        // Buscar la entidad MacronutrientValues recién creada
         var macronutrientOpt = macronutrientValuesRepository.findById(macroId);
         if (macronutrientOpt.isEmpty()) {
-            return ResponseEntity.badRequest().build(); // debería ser raro que ocurra
+            return ResponseEntity.badRequest().build();
         }
 
         var trackingGoalCommand = new CreateTrackingGoalCommand(userId, macronutrientOpt.get());
@@ -143,5 +205,4 @@ public class TrackingGoalController {
 
         return ResponseEntity.status(201).body(goalId);
     }
-
 }

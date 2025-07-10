@@ -1,63 +1,74 @@
 package pe.edu.upc.center.backendNutriSmart.tracking.application.internal.outboundservices.acl;
 
-
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.UserProfile;
-import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.queries.GetUserProfileByIdQuery;
-import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.queries.GetAllUserProfilesQuery;
-import pe.edu.upc.center.backendNutriSmart.profiles.domain.services.UserProfileQueryService;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.ProfileContextFacade;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.UserProfilesContextFacade;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.UserId;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
  * External Profile Service
- * This service provides an ACL (Anti-Corruption Layer) for other bounded contexts
- * to interact with the Profile Profile domain without directly coupling to its internal structure.
+ * This service provides an ACL (Anti-Corruption Layer) for the Tracking bounded context
+ * to interact with the Profile bounded context without direct coupling.
  */
 @Service
 public class ExternalProfileService {
 
-    private final UserProfileQueryService queryService;
+    private final UserProfilesContextFacade userProfilesFacade;
 
-    public ExternalProfileService(UserProfileQueryService queryService) {
-        this.queryService = queryService;
+    private final ProfileContextFacade profileContextFacade;
+
+    public ExternalProfileService(UserProfilesContextFacade userProfilesFacade, ProfileContextFacade profileContextFacade) {
+        this.userProfilesFacade = userProfilesFacade;
+        this.profileContextFacade = profileContextFacade;
+    }
+
+    public boolean existsByUserId(UserId userId) {
+        return profileContextFacade.fetchAll().stream()
+                .anyMatch(profile -> profile.userProfileId() == userId.userId());
     }
 
     /**
-     * Fetches a user profile by its ID
-     * @param profileId The ID of the profile to fetch
-     * @return Optional containing the UserProfile if found, empty otherwise
+     * Obtiene el nombre del objetivo de un perfil de usuario
+     * @param profileId ID del perfil (equivale al userId en el contexto de tracking)
+     * @return Optional con el nombre del objetivo si existe
      */
-    public Optional<UserProfile> fetchUserProfileById(Long profileId) {
-        if (profileId == null || profileId <= 0) {
-            return Optional.empty();
+    public Optional<String> getObjectiveNameByProfileId(Long profileId) {
+        return userProfilesFacade.fetchObjectiveNameByProfileId(profileId);
+    }
+
+    /**
+     * Verifica si un perfil existe
+     * @param profileId ID del perfil
+     * @return true si el perfil existe, false en caso contrario
+     */
+    public boolean existsProfile(Long profileId) {
+        return userProfilesFacade.existsProfileById(profileId);
+    }
+
+    /**
+     * Valida que un perfil exista antes de crear/actualizar un tracking goal
+     * @param profileId ID del perfil
+     * @throws IllegalArgumentException si el perfil no existe
+     */
+    public void validateProfileExists(Long profileId) {
+        if (!existsProfile(profileId)) {
+            throw new IllegalArgumentException("Profile not found with ID: " + profileId);
         }
-        return queryService.handle(new GetUserProfileByIdQuery(profileId));
     }
 
     /**
-     * Fetches all user profiles
-     * @return List of all UserProfile entities
+     * Obtiene el objetivo y valida que el perfil exista
+     * @param profileId ID del perfil
+     * @return Nombre del objetivo
+     * @throws IllegalArgumentException si el perfil no existe o no tiene objetivo
      */
-    public List<UserProfile> fetchAllUserProfiles() {
-        return queryService.handle(new GetAllUserProfilesQuery());
-    }
+    public String getValidatedObjectiveName(Long profileId) {
+        validateProfileExists(profileId);
 
-    /**
-     * Checks if a user profile exists by ID
-     * @param profileId The ID to check
-     * @return true if the profile exists, false otherwise
-     */
-    public boolean existsUserProfileById(Long profileId) {
-        return fetchUserProfileById(profileId).isPresent();
-    }
-
-    /**
-     * Gets the count of all user profiles
-     * @return The total number of user profiles
-     */
-    public long getUserProfileCount() {
-        return fetchAllUserProfiles().size();
+        return getObjectiveNameByProfileId(profileId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Profile exists but has no objective defined for ID: " + profileId));
     }
 }

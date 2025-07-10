@@ -1,10 +1,9 @@
-// MealPlanTypeRepository
 package pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories;
 
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanType;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.MealPlanTypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanType;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.MealPlanTypes;
 
 import java.util.Optional;
 

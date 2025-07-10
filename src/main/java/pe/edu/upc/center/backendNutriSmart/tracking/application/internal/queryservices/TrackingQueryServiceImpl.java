@@ -1,5 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.tracking.application.internal.queryservices;
 
+import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanEntryRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates.Tracking;
@@ -17,25 +18,25 @@ import java.util.Optional;
 
 @Service
 public class TrackingQueryServiceImpl implements TrackingQueryService {
-   private final TrackingRepository trackingRepository;
-   private final MacronutrientValuesRepository macronutrientValuesRepository;
-   private final TrackingMealPlanEntryRepository trackingMealPlanEntryRepository;
+    private final TrackingRepository trackingRepository;
+    private final MacronutrientValuesRepository macronutrientValuesRepository;
+    private final MealPlanEntryRepository mealPlanEntryRepository;
 
-   public TrackingQueryServiceImpl(TrackingRepository trackingRepository, MacronutrientValuesRepository macronutrientValuesRepository
-   , TrackingMealPlanEntryRepository trackingMealPlanEntryRepository) {
-       this.trackingRepository = trackingRepository;
-       this.macronutrientValuesRepository = macronutrientValuesRepository;
-       this.trackingMealPlanEntryRepository = trackingMealPlanEntryRepository;
-   }
+    public TrackingQueryServiceImpl(TrackingRepository trackingRepository, MacronutrientValuesRepository macronutrientValuesRepository
+            , MealPlanEntryRepository mealPlanEntryRepository) {
+        this.trackingRepository = trackingRepository;
+        this.macronutrientValuesRepository = macronutrientValuesRepository;
+        this.mealPlanEntryRepository = mealPlanEntryRepository;
+    }
 
     @Override
     public List<MealPlanEntry> handle(GetAllMealsQuery query) {
-        return trackingMealPlanEntryRepository.findAllByTrackingId(query.TrackingId());
+        return mealPlanEntryRepository.findAllByTrackingId(query.TrackingId());
     }
 
     @Override
     public Optional<Tracking> handle(GetTrackingByUserIdQuery query) {
-       return this.trackingRepository.findByUserId(query.userId());
+        return this.trackingRepository.findByUserId(query.userId());
     }
 
     @Override
