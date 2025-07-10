@@ -119,12 +119,12 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
     private Recommendation createAssignedCopy(Recommendation base, Long userId) {
         return Recommendation.assignToUser(
                 new UserId(userId),
-                base.getTemplateId(),
+                base.getTemplate().getId(),
                 base.getReason(),
                 base.getNotes(),
                 base.getTimeOfDay(),
                 base.getScore(),
-                RecommendationStatus.ACTIVE // Activo al asignar
+                RecommendationStatus.ACTIVE
         );
     }
 }

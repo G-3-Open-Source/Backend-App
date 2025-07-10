@@ -95,46 +95,4 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
         template.setId(templateId);
         return new Recommendation(userId, template, reason, notes, timeOfDay, score, status);
     }
-
-    // Método para asignar recommendation existente a usuario
-    public void assignToUser(Long userId) {
-        this.userId = new UserId(userId);
-        this.assignedAt = LocalDateTime.now();
-        this.status = RecommendationStatus.ACTIVE;
-    }
-
-    public void activate() {
-        this.status = RecommendationStatus.ACTIVE;
-    }
-
-    public void deactivate() {
-        this.status = RecommendationStatus.INACTIVE;
-    }
-
-    public void complete() {
-        this.status = RecommendationStatus.INACTIVE;
-    }
-
-    public boolean isActive() {
-        return this.status == RecommendationStatus.ACTIVE;
-    }
-
-    public boolean isCompleted() {
-        return this.status == RecommendationStatus.INACTIVE;
-    }
-
-    public Long getTemplateId() {
-        return template != null ? template.getId() : null;
-    }
-
-    public void updateScore(Double newScore) {
-        if (newScore >= 0.0 && newScore <= 10.0) {
-            this.score = newScore;
-        }
-    }
-
-    // Verificar si la recommendation está asignada
-    public boolean isAssigned() {
-        return this.userId != null && this.userId.getValue() != null;
-    }
 }

@@ -13,8 +13,10 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.Recom
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationQueryService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.AssignRecommendationResource;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.CreateRecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.RecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.AssignRecommendationCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.CreateRecommendationCommandFromResourceAssembler;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.RecommendationResourceFromEntityAssembler;
 
 import java.util.List;
@@ -85,7 +87,26 @@ public class RecommendationController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
+    @PostMapping
+    public ResponseEntity<RecommendationResource> createBaseRecommendation(@RequestBody CreateRecommendationResource resource) {
+        try {
+            // Validación: userId debe ser null (solo base)
+            if (resource == null || resource.templateId() == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            // Llama al servicio para crear recommendation base
+            int recommendationId = commandService.handle(
+                    CreateRecommendationCommandFromResourceAssembler.toCommandFromResource(resource)
+            );
+            // Busca la recommendation recién creada
+            return recommendationRepository.findById((long) recommendationId)
+                    .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
+                    .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     // ✅ 3. OBTENER RECOMMENDATIONS POR USUARIO
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<RecommendationResource>> getUserRecommendations(@PathVariable Long userId) {
@@ -128,6 +149,39 @@ public class RecommendationController {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(resources);
 
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{recommendationId}")
+    public ResponseEntity<RecommendationResource> updateRecommendation(
+            @PathVariable Long recommendationId,
+            @RequestBody CreateRecommendationResource resource) {
+        try {
+            return recommendationRepository.findById(recommendationId)
+                    .map(existing -> {
+                        // Actualiza los campos editables
+                        existing.setReason(resource.reason());
+                        existing.setNotes(resource.notes());
+                        existing.setTimeOfDay(resource.timeOfDay());
+                        existing.setScore(resource.score());
+                        existing.setStatus(resource.status());
+                        // Si se permite cambiar el template:
+                        if (resource.templateId() != null) {
+                            var template = existing.getTemplate();
+                            if (!template.getId().equals(resource.templateId())) {
+                                // Crea un nuevo template solo con ID para asignar (o busca el real si lo prefieres)
+                                var newTemplate = new pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate();
+                                newTemplate.setId(resource.templateId());
+                                existing.setTemplate(newTemplate);
+                            }
+                        }
+                        Recommendation updated = recommendationRepository.save(existing);
+                        RecommendationResource response = RecommendationResourceFromEntityAssembler.toResourceFromEntity(updated);
+                        return ResponseEntity.ok(response);
+                    })
+                    .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
