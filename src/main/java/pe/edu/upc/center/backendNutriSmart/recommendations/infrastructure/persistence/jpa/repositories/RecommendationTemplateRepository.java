@@ -1,11 +1,10 @@
 package pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories;
 
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate;
 
-@Repository
+import java.util.List;
+
 public interface RecommendationTemplateRepository extends JpaRepository<RecommendationTemplate, Long> {
-    // Puedes agregar métodos personalizados si los necesitas, por ejemplo:
-    // Optional<RecommendationTemplate> findByTitle(String title);
+    List<RecommendationTemplate> findByCategory(String category);
 }

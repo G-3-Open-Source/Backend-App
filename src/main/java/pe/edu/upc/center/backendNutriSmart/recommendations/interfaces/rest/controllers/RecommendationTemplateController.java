@@ -1,5 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resou
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "Recommendation Template", description = "Recommendation Template Endpoints")
 @RestController
 @RequestMapping("/api/v1/recommendation-templates")
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class RecommendationTemplateController {
 
     @PostMapping
     public ResponseEntity<RecommendationTemplate> createTemplate(@RequestBody CreateTemplateResource resource) {
-        RecommendationTemplate template = new RecommendationTemplate(resource.title(), resource.content());
+        RecommendationTemplate template = new RecommendationTemplate(resource.title(), resource.content(), resource.category());
         RecommendationTemplate saved = repository.save(template);
         return ResponseEntity.created(URI.create("/api/v1/recommendation-templates/" + saved.getId())).body(saved);
     }

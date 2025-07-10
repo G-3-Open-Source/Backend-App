@@ -4,18 +4,17 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.aggregat
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.RecommendationResource;
 
 public class RecommendationResourceFromEntityAssembler {
-
     public static RecommendationResource toResourceFromEntity(Recommendation entity) {
         return new RecommendationResource(
-                entity.getId(),
-                entity.getUserId().value(),
+                (long) entity.getId(),
+                entity.getUserId() != null ? entity.getUserId().getValue() : null, // ← Manejar null
                 entity.getTemplateId(),
                 entity.getReason(),
                 entity.getNotes(),
-                entity.getTimeOfDay(),
+                entity.getTimeOfDay().name(),
                 entity.getScore(),
-                entity.getStatus(),
-                entity.getAssignedAt()
+                entity.getStatus().name(),
+                entity.getAssignedAt() // Puede ser null para recommendations sin asignar
         );
     }
 }

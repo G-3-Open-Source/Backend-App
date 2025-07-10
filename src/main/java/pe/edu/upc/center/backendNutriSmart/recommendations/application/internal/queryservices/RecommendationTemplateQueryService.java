@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RecommendationTemplateQueryService {
+public class RecommendationTemplateQueryService implements pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationTemplateQueryService {
 
     private final RecommendationTemplateRepository repository;
 
@@ -15,6 +15,7 @@ public class RecommendationTemplateQueryService {
         this.repository = repository;
     }
 
+    @Override
     public List<RecommendationTemplate> getAllTemplates() {
         return repository.findAll();
     }

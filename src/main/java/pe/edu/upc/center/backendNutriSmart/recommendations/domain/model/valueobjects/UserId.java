@@ -5,12 +5,19 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public record UserId(Long value) {
     public UserId {
-        if (value == null || value <= 0) {
-            throw new IllegalArgumentException("Profile ID must be positive and non-null.");
+        // Permitir null para recomendaciones sin usuario asignado
+        if (value != null && value <= 0) {
+            throw new IllegalArgumentException("User ID must be positive when provided.");
         }
     }
 
+    // Constructor sin argumentos requerido por JPA
     public UserId() {
-        this(0L);
+        this(null);
+    }
+
+    // Método getter explícito (opcional, pero usado en el proyecto)
+    public Long getValue() {
+        return value;
     }
 }
