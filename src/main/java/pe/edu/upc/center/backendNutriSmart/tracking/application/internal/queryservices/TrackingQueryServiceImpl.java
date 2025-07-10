@@ -2,7 +2,7 @@ package pe.edu.upc.center.backendNutriSmart.tracking.application.internal.querys
 
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanEntryRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanEntry;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingMealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates.Tracking;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetAllMealsQuery;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetConsumedMacrosQuery;
@@ -20,18 +20,18 @@ import java.util.Optional;
 public class TrackingQueryServiceImpl implements TrackingQueryService {
     private final TrackingRepository trackingRepository;
     private final MacronutrientValuesRepository macronutrientValuesRepository;
-    private final MealPlanEntryRepository mealPlanEntryRepository;
+    private final TrackingMealPlanEntryRepository trackingMealPlanEntryRepository;
 
     public TrackingQueryServiceImpl(TrackingRepository trackingRepository, MacronutrientValuesRepository macronutrientValuesRepository
-            , MealPlanEntryRepository mealPlanEntryRepository) {
+            , TrackingMealPlanEntryRepository trackingMealPlanEntryRepository) {
         this.trackingRepository = trackingRepository;
         this.macronutrientValuesRepository = macronutrientValuesRepository;
-        this.mealPlanEntryRepository = mealPlanEntryRepository;
+        this.trackingMealPlanEntryRepository = trackingMealPlanEntryRepository;
     }
 
     @Override
-    public List<MealPlanEntry> handle(GetAllMealsQuery query) {
-        return mealPlanEntryRepository.findAllByTrackingId(query.TrackingId());
+    public List<TrackingMealPlanEntry> handle(GetAllMealsQuery query) {
+        return trackingMealPlanEntryRepository.findAllByTrackingId(query.TrackingId());
     }
 
     @Override

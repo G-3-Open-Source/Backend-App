@@ -8,8 +8,8 @@ import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.Update
 import java.util.Optional;
 
 public interface TrackingCommandService {
-    Long handle(CreateTrackingCommand command);
-    Long handle(CreateMealPlanEntryToTrackingCommand command);
+    int handle(CreateTrackingCommand command);
+    int handle(CreateMealPlanEntryToTrackingCommand command);
     void handle(RemoveMealPlanEntryFromTrackingCommand command);
     Optional<Tracking> handle(UpdateMealPlanEntryInTrackingCommand command);
 }

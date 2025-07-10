@@ -2,8 +2,8 @@ package pe.edu.upc.center.backendNutriSmart.tracking.interfaces.acl;
 
 import org.springframework.stereotype.Service;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingGoal;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingMealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates.Tracking;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.*;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.*;
@@ -83,7 +83,7 @@ public class TrackingContextFacade {
     /**
      * Obtiene todas las comidas de un tracking
      */
-    public List<MealPlanEntry> getAllMealsByTrackingId(Long trackingId) {
+    public List<TrackingMealPlanEntry> getAllMealsByTrackingId(Long trackingId) {
         return trackingQueryService.handle(new GetAllMealsQuery(trackingId));
     }
 
