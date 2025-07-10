@@ -50,7 +50,7 @@ public class UserProfileCommandServiceImpl implements UserProfileCommandService 
     @Override
     public Optional<UserProfile> handle(UpdateUserProfileCommand command) {
         var profile = userProfileRepository.findById(command.userProfileId())
-                .orElseThrow(() -> new IllegalArgumentException("User profile not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Profile profile not found"));
 
         var activityLevel = activityLevelRepository.findById(command.activityLevelId())
                 .orElseThrow(() -> new IllegalArgumentException("Activity level not found"));
@@ -68,7 +68,7 @@ public class UserProfileCommandServiceImpl implements UserProfileCommandService 
     @Override
     public void handle(DeleteUserProfileCommand command) {
         if (!userProfileRepository.existsById(command.userProfileId())) {
-            throw new IllegalArgumentException("User profile not found");
+            throw new IllegalArgumentException("Profile profile not found");
         }
         userProfileRepository.deleteById(command.userProfileId());
     }

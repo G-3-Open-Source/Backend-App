@@ -45,7 +45,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
     public int handle(CreateMealPlanEntryToTrackingCommand command) {
         // Validar que el usuario existe antes de proceder
         if (!externalProfileService.existsUserProfileById(command.userId().userId())) {
-            throw new IllegalArgumentException("User profile not found with id: " + command.userId());
+            throw new IllegalArgumentException("Profile profile not found with id: " + command.userId());
         }
 
         // Buscar el tracking por ID de usuario
@@ -93,7 +93,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         // Validar que el usuario del tracking existe (asumiendo que tracking tiene getUserId())
         if (!externalProfileService.existsUserProfileById(tracking.getUserId().userId())) {
-            throw new IllegalArgumentException("User profile not found for tracking: " + tracking.getUserId());
+            throw new IllegalArgumentException("Profile profile not found for tracking: " + tracking.getUserId());
         }
 
         Optional<MealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
@@ -127,7 +127,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         // Validar que el usuario del tracking existe
         if (!externalProfileService.existsUserProfileById(tracking.getUserId().userId())) {
-            throw new IllegalArgumentException("User profile not found for tracking: " + tracking.getUserId());
+            throw new IllegalArgumentException("Profile profile not found for tracking: " + tracking.getUserId());
         }
 
         Optional<MealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
@@ -165,7 +165,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
     public int handle(CreateTrackingCommand command) {
         // Validar que el usuario existe antes de crear el tracking
         if (!externalProfileService.existsUserProfileById(command.profile().userId())) {
-            throw new IllegalArgumentException("User profile not found with id: " + command.profile());
+            throw new IllegalArgumentException("Profile profile not found with id: " + command.profile());
         }
 
         if(this.trackingRepository.existsByUserId(command.profile())){

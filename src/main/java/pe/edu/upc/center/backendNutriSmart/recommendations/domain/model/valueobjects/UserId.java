@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable;
 public record UserId(Long value) {
     public UserId {
         if (value == null || value <= 0) {
-            throw new IllegalArgumentException("User ID must be positive and non-null.");
+            throw new IllegalArgumentException("Profile ID must be positive and non-null.");
         }
     }
 

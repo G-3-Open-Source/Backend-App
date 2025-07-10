@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * External Profile Service
  * This service provides an ACL (Anti-Corruption Layer) for other bounded contexts
- * to interact with the User Profile domain without directly coupling to its internal structure.
+ * to interact with the Profile Profile domain without directly coupling to its internal structure.
  */
 @Service
 public class ExternalProfileService {

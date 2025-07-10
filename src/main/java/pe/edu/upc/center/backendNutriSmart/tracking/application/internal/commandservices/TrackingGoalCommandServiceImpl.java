@@ -24,7 +24,7 @@ public class TrackingGoalCommandServiceImpl implements TrackingGoalCommandServic
     public Long handle(CreateTrackingGoalCommand command) {
         // Validar que el usuario existe antes de crear el tracking goal
         if (!externalProfileService.existsUserProfileById(command.profile().userId())) {
-            throw new IllegalArgumentException("User profile not found with id: " + command.profile());
+            throw new IllegalArgumentException("Profile profile not found with id: " + command.profile());
         }
 
         TrackingGoal trackingGoal = new TrackingGoal(command.profile(),
