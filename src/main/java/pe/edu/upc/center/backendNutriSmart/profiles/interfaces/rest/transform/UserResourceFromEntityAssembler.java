@@ -1,26 +1,26 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.transform;
 
-import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.User;
-import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.UserResource;
+import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.aggregates.Profile;
+import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest.resources.ProfileResource;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserResourceFromEntityAssembler {
 
-    public static UserResource toResourceFromEntity(User user) {
-        return new UserResource(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getIsActive(),
-                user.getBirthDate(),
-                user.getUserProfile().getId()
+    public static ProfileResource toResourceFromEntity(Profile profile) {
+        return new ProfileResource(
+                profile.getId(),
+                profile.getName(),
+                profile.getEmail(),
+                profile.getPassword(),
+                profile.getIsActive(),
+                profile.getBirthDate(),
+                profile.getUserProfile().getId()
         );
     }
 
-    public static List<UserResource> toResources(List<User> users) {
-        return users.stream().map(UserResourceFromEntityAssembler::toResourceFromEntity).collect(Collectors.toList());
+    public static List<ProfileResource> toResources(List<Profile> profiles) {
+        return profiles.stream().map(UserResourceFromEntityAssembler::toResourceFromEntity).collect(Collectors.toList());
     }
 }

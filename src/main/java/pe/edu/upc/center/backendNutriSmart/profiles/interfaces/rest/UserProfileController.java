@@ -1,5 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.UserProfilesContextFacade;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/user-profiles")
+@Tag(name = "UserProfiles", description = "se registra el perfil del usuario")
 public class UserProfileController {
     private final UserProfilesContextFacade facade;
 

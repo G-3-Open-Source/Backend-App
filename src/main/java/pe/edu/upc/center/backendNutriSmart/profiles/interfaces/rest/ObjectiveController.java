@@ -1,5 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.interfaces.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities.Objective;
 import pe.edu.upc.center.backendNutriSmart.profiles.infrastructure.persistence.jpa.repositories.ObjectiveRepository;
@@ -8,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/objectives")
+@Tag(name = "Objetives", description = "registras tu objetivo")
 public class ObjectiveController {
     private final ObjectiveRepository repository;
 
