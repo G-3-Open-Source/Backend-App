@@ -26,6 +26,10 @@ public class OpenApiConfiguration {
                         .description("Nutri Smart Backend API - Open Source"));
 
 
+
+
+
+
         final String securitySchemeName = "bearerAuth";
 
         openApi.addSecurityItem(new SecurityRequirement()
