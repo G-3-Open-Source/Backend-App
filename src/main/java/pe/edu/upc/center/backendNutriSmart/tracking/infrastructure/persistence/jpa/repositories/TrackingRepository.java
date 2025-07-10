@@ -1,7 +1,7 @@
 package pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories;
 
 
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanEntry;
+
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates.Tracking;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;

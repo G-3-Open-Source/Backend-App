@@ -5,9 +5,9 @@ import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.j
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanTypeRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.outboundservices.acl.ExternalProfileService;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanType;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingGoal;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingMealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates.Tracking;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.CreateMealPlanEntryToTrackingCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.CreateTrackingCommand;
@@ -41,7 +41,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
     }
 
     @Override
-    public Long handle(CreateMealPlanEntryToTrackingCommand command) {
+    public int handle(CreateMealPlanEntryToTrackingCommand command) {
         // Buscar el tracking por ID de usuario
         Optional<Tracking> trackingOpt = trackingRepository.findByUserId(command.userId());
 
@@ -56,7 +56,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
         Tracking tracking = trackingOpt.get();
 
         // Crear nuevo MealPlanEntry
-        MealPlanEntry newEntry = new MealPlanEntry(
+        TrackingMealPlanEntry newEntry = new TrackingMealPlanEntry(
                 command.recipeId(),
                 mealPlanType,
                 command.DayNumber()
@@ -86,13 +86,13 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         Tracking tracking = trackingOpt.get();
 
-        Optional<MealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
+        Optional<TrackingMealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
 
         if (mealPlanEntryOpt.isEmpty()) {
             throw new IllegalArgumentException("MealPlan not found with id: " + command.MealPlanEntryId());
         }
 
-        MealPlanEntry mealPlanEntry = mealPlanEntryOpt.get();
+        TrackingMealPlanEntry mealPlanEntry = mealPlanEntryOpt.get();
 
         // Remover el MealPlanEntry
         boolean removed = tracking.removeMealPlanEntry(mealPlanEntry);
@@ -115,13 +115,13 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
         Tracking tracking = trackingOpt.get();
 
-        Optional<MealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
+        Optional<TrackingMealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
 
         if (mealPlanEntryOpt.isEmpty()) {
             throw new IllegalArgumentException("MealPlan not found with id: " + command.MealPlanEntryId());
         }
 
-        MealPlanEntry mealPlanEntry = mealPlanEntryOpt.get();
+        TrackingMealPlanEntry mealPlanEntry = mealPlanEntryOpt.get();
 
         MealPlanType mealPlanType = trackingMealPlanTypeRepository.findByName(command.mealPlanType())
                 .orElseThrow(() -> new IllegalArgumentException("Tipo de plan de comida inválido: " + command.mealPlanType()));
@@ -131,7 +131,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
         trackingMealPlanEntryRepository.delete(mealPlanEntry); // NUEVO
 
         // Crear nuevo entry con los datos actualizados
-        MealPlanEntry updatedEntry = new MealPlanEntry(
+        TrackingMealPlanEntry updatedEntry = new TrackingMealPlanEntry(
                 command.recipeId(),
                 mealPlanType,
                 command.dayNumber()
@@ -147,7 +147,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
         return Optional.of(savedTracking);
     }
 
-    public Long handle(CreateTrackingCommand command) {
+    public int handle(CreateTrackingCommand command) {
 
         // NUEVA VERIFICACIÓN
         if (!externalProfileService.existsByUserId(command.profile())) {

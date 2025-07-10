@@ -5,7 +5,7 @@ import java.util.List;
 
 //para get y put
 public record TrackingResource(
-        Long id,
+        int id,
         Long userId,
         //@JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,

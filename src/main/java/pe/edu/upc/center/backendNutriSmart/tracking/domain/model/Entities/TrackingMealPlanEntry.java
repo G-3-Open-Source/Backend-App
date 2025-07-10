@@ -3,9 +3,7 @@ package pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities;
 
 import pe.edu.upc.center.backendNutriSmart.shared.domain.model.entities.AuditableModel;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates.Tracking;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.MealPlanTypes;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.RecipeId;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.UserId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -17,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "tracking_meal_plan_entry")
-public class MealPlanEntry extends AuditableModel {
+public class TrackingMealPlanEntry extends AuditableModel {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -42,11 +40,11 @@ public class MealPlanEntry extends AuditableModel {
   private Tracking tracking;
 
 
-  public MealPlanEntry() {
+  public TrackingMealPlanEntry() {
 
   }
 
-  public MealPlanEntry(RecipeId recipeId, MealPlanType mealPlanType, int dayNumber) {
+  public TrackingMealPlanEntry(RecipeId recipeId, MealPlanType mealPlanType, int dayNumber) {
     this.recipeId = recipeId;
     this.mealPlanType = mealPlanType;
     this.dayNumber = dayNumber;
