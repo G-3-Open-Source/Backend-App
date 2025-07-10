@@ -15,6 +15,7 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persis
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.AssignRecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.CreateRecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.RecommendationResource;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.UpdateRecommendationResource;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.AssignRecommendationCommandFromResourceAssembler;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.CreateRecommendationCommandFromResourceAssembler;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.transform.RecommendationResourceFromEntityAssembler;
@@ -87,10 +88,12 @@ public class RecommendationController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @PostMapping
+
+    // ✅ 3. CREAR RECOMMENDATION BASE (sin asignar)
+    @PostMapping("/base")
     public ResponseEntity<RecommendationResource> createBaseRecommendation(@RequestBody CreateRecommendationResource resource) {
         try {
-            // Validación: userId debe ser null (solo base)
+            // Validación: resource válido y templateId presente
             if (resource == null || resource.templateId() == null) {
                 return ResponseEntity.badRequest().build();
             }
@@ -103,11 +106,14 @@ public class RecommendationController {
                     .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
                     .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
                     .orElse(ResponseEntity.notFound().build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
-    // ✅ 3. OBTENER RECOMMENDATIONS POR USUARIO
+
+    // ✅ 4. OBTENER RECOMMENDATIONS POR USUARIO
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<RecommendationResource>> getUserRecommendations(@PathVariable Long userId) {
         try {
@@ -122,7 +128,7 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 4. ELIMINAR RECOMMENDATION
+    // ✅ 5. ELIMINAR RECOMMENDATION
     @DeleteMapping("/{recommendationId}")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long recommendationId) {
         try {
@@ -139,7 +145,7 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 5. OBTENER TODAS LAS RECOMMENDATIONS (admin)
+    // ✅ 6. OBTENER TODAS LAS RECOMMENDATIONS (admin)
     @GetMapping
     public ResponseEntity<List<RecommendationResource>> getAllRecommendations() {
         try {
@@ -154,34 +160,20 @@ public class RecommendationController {
         }
     }
 
+    // ✅ 7. ACTUALIZAR RECOMMENDATION
     @PutMapping("/{recommendationId}")
     public ResponseEntity<RecommendationResource> updateRecommendation(
             @PathVariable Long recommendationId,
-            @RequestBody CreateRecommendationResource resource) {
+            @RequestBody UpdateRecommendationResource resource) {
         try {
-            return recommendationRepository.findById(recommendationId)
-                    .map(existing -> {
-                        // Actualiza los campos editables
-                        existing.setReason(resource.reason());
-                        existing.setNotes(resource.notes());
-                        existing.setTimeOfDay(resource.timeOfDay());
-                        existing.setScore(resource.score());
-                        existing.setStatus(resource.status());
-                        // Si se permite cambiar el template:
-                        if (resource.templateId() != null) {
-                            var template = existing.getTemplate();
-                            if (!template.getId().equals(resource.templateId())) {
-                                // Crea un nuevo template solo con ID para asignar (o busca el real si lo prefieres)
-                                var newTemplate = new pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate();
-                                newTemplate.setId(resource.templateId());
-                                existing.setTemplate(newTemplate);
-                            }
-                        }
-                        Recommendation updated = recommendationRepository.save(existing);
-                        RecommendationResource response = RecommendationResourceFromEntityAssembler.toResourceFromEntity(updated);
-                        return ResponseEntity.ok(response);
-                    })
-                    .orElse(ResponseEntity.notFound().build());
+            Recommendation updated = commandService.handleUpdate(recommendationId, resource);
+            RecommendationResource response = RecommendationResourceFromEntityAssembler.toResourceFromEntity(updated);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

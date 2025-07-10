@@ -13,6 +13,7 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.Recom
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationTemplateService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.RecommendationStatus;
+import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.UpdateRecommendationResource;
 
 import java.util.List;
 import java.util.Optional;
@@ -126,5 +127,19 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
                 base.getScore(),
                 RecommendationStatus.ACTIVE
         );
+    }
+    @Override
+    public Recommendation handleUpdate(Long recommendationId, UpdateRecommendationResource resource) {
+        Recommendation recommendation = recommendationRepository.findById(recommendationId)
+                .orElseThrow(() -> new RuntimeException("Recommendation not found: " + recommendationId));
+
+        // Actualiza solo los campos permitidos
+        if (resource.reason() != null) recommendation.setReason(resource.reason());
+        if (resource.notes() != null) recommendation.setNotes(resource.notes());
+        if (resource.timeOfDay() != null) recommendation.setTimeOfDay(resource.timeOfDay());
+        if (resource.score() != null) recommendation.setScore(resource.score());
+        if (resource.status() != null) recommendation.setStatus(resource.status());
+
+        return recommendationRepository.save(recommendation);
     }
 }
