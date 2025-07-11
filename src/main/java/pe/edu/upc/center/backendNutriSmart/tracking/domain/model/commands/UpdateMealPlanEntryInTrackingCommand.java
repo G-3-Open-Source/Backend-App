@@ -5,3 +5,4 @@ import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.Re
 
 public record UpdateMealPlanEntryInTrackingCommand(long TrackingId, long MealPlanEntryId, RecipeId recipeId, MealPlanTypes mealPlanType, int dayNumber) {
 }
+

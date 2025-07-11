@@ -24,7 +24,7 @@ public class MacronutrientValuesController {
     private final TrackingQueryService trackingQueryService;
 
     public MacronutrientValuesController(MacronutrientValuesQueryService macronutrientValuesQueryService
-    , TrackingQueryService trackingQueryService) {
+            , TrackingQueryService trackingQueryService) {
         this.macronutrientValuesQueryService = macronutrientValuesQueryService;
         this.trackingQueryService = trackingQueryService;
     }

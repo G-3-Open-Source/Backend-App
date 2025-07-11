@@ -2,8 +2,8 @@ package pe.edu.upc.center.backendNutriSmart.tracking.domain.model.aggregates;
 
 import pe.edu.upc.center.backendNutriSmart.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
-import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingGoal;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingMealPlanEntry;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.commands.CreateTrackingCommand;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.MealPlanEntries;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.valueobjects.UserId;
@@ -20,11 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "tracking")
 @ToString
-public class gitTracking extends AuditableAbstractAggregateRoot<Tracking> {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Tracking extends AuditableAbstractAggregateRoot<Tracking> {
 
     @Column(name = "tracking_date", nullable = false)
     private LocalDate date;
@@ -75,19 +71,19 @@ public class gitTracking extends AuditableAbstractAggregateRoot<Tracking> {
     }
 
     // Métodos de negocio para gestionar las entradas del plan de comidas
-    public void addMealPlanEntry(MealPlanEntry mealPlanEntry) {
+    public void addMealPlanEntry(TrackingMealPlanEntry mealPlanEntry) {
         this.mealPlanEntries.addEntry(mealPlanEntry);
     }
 
-    public void addMealPlanEntries(List<MealPlanEntry> entries) {
+    public void addMealPlanEntries(List<TrackingMealPlanEntry> entries) {
         this.mealPlanEntries.addEntries(entries);
     }
 
-    public boolean removeMealPlanEntry(MealPlanEntry mealPlanEntry) {
+    public boolean removeMealPlanEntry(TrackingMealPlanEntry mealPlanEntry) {
         return mealPlanEntries.removeEntryById(mealPlanEntry.getId());
     }
 
-    public void updateMealPlanEntry(MealPlanEntry oldEntry, MealPlanEntry newEntry) {
+    public void updateMealPlanEntry(TrackingMealPlanEntry oldEntry, TrackingMealPlanEntry newEntry) {
         this.mealPlanEntries.removeEntryById(oldEntry.getId());
         this.mealPlanEntries.addEntry(newEntry);
     }

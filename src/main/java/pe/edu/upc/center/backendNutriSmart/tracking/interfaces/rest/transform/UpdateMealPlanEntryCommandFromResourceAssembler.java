@@ -10,7 +10,7 @@ import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.rest.resources.Up
 public class UpdateMealPlanEntryCommandFromResourceAssembler {
     public static UpdateMealPlanEntryInTrackingCommand toCommand(UpdateMealPlanEntryResource resource, Long mealPlanEntryId) {
         return new UpdateMealPlanEntryInTrackingCommand(
-                resource.trackingId(),
+                resource.trackingId() != null ? resource.trackingId() : 0L, // Si es null, pasar 0L para que el service lo resuelva
                 mealPlanEntryId,
                 new RecipeId(resource.recipeId()),
                 MealPlanTypes.valueOf(resource.mealPlanType()),
