@@ -1,0 +1,5 @@
+[phases.build]
+nixPkgs = ["openjdk21"]
+
+[variables]
+JAVA_VERSION = "21"
