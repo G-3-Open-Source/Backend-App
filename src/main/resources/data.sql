@@ -133,3 +133,5 @@ INSERT INTO meal_plans (
 -- 10
 (true, 1500, 120, 40, 90, 10, NOW(), NOW(), 'Ayuno intermitente', 'Plan 16/8', 'Plan adaptado a horarios de ayuno intermitente.');
 
+SELECT setval('recommendations_id_seq', (SELECT MAX(id) FROM recommendations) + 1);
+SELECT setval('recommendation_templates_id_seq', (SELECT MAX(id) FROM recommendation_templates) + 1);
