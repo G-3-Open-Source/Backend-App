@@ -1,7 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.recommendations.application.internal.commandservices;
 
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.UserProfilesContextFacade;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.aggregates.Recommendation;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AssignRecommendationCommand;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.AutoAssignRecommendationsCommand;
@@ -9,10 +8,11 @@ import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.commands.DeleteRecommendationCommand;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.entities.RecommendationTemplate;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.UserId;
+import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.RecommendationStatus;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationCommandService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.domain.services.RecommendationTemplateService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.infrastructure.persistence.jpa.repositories.RecommendationRepository;
-import pe.edu.upc.center.backendNutriSmart.recommendations.domain.model.valueobjects.RecommendationStatus;
+import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.outboundservices.acl.ExternalProfileService;
 import pe.edu.upc.center.backendNutriSmart.recommendations.interfaces.rest.resources.UpdateRecommendationResource;
 
 import java.util.List;
@@ -24,15 +24,15 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
 
     private final RecommendationRepository recommendationRepository;
     private final RecommendationTemplateService templateService;
-    private final UserProfilesContextFacade userProfilesACL;
+    private final ExternalProfileService externalProfileService;
 
     public RecommendationCommandServiceImpl(
             RecommendationRepository recommendationRepository,
             RecommendationTemplateService templateService,
-            UserProfilesContextFacade userProfilesACL) {
+            ExternalProfileService externalProfileService) {
         this.recommendationRepository = recommendationRepository;
         this.templateService = templateService;
-        this.userProfilesACL = userProfilesACL;
+        this.externalProfileService = externalProfileService;
     }
 
     @Override
@@ -57,14 +57,13 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
 
     @Override
     public int handle(AssignRecommendationCommand command) {
-        validateUserExists(command.userId());
+        externalProfileService.validateProfileExists(command.userId());
 
         Optional<RecommendationTemplate> templateOpt = templateService.findById(command.templateId());
         if (templateOpt.isEmpty()) {
             throw new RuntimeException("Template not found: " + command.templateId());
         }
 
-        // ✅ CREAR RECOMMENDATION ASIGNADA DIRECTAMENTE
         Recommendation assignedRecommendation = Recommendation.assignToUser(
                 new UserId(command.userId()),
                 command.templateId(),
@@ -81,17 +80,14 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
 
     @Override
     public List<Recommendation> handleAutoAssign(AutoAssignRecommendationsCommand command) {
-        // ✅ VALIDAR USUARIO EXISTE EN PROFILES BC
-        validateUserExists(command.userId());
+        externalProfileService.validateProfileExists(command.userId());
 
-        // ✅ OBTENER RECOMMENDATIONS BASE DISPONIBLES
         List<Recommendation> baseRecommendations = recommendationRepository.findByUserIdIsNull();
 
         if (baseRecommendations.isEmpty()) {
-            throw new RuntimeException("No hay recommendations BASE disponibles para auto-asignar");
+            throw new RuntimeException("No hay recomendaciones BASE disponibles para auto-asignar");
         }
 
-        // ✅ CREAR COPIAS ASIGNADAS AL USUARIO (límite de 3)
         List<Recommendation> assignedRecommendations = baseRecommendations.stream()
                 .limit(3)
                 .map(base -> createAssignedCopy(base, command.userId()))
@@ -102,21 +98,12 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
 
     @Override
     public void handle(DeleteRecommendationCommand command) {
-        // ✅ VALIDAR RECOMMENDATION EXISTE
         Recommendation recommendation = recommendationRepository.findById(command.recommendationId())
                 .orElseThrow(() -> new RuntimeException("Recommendation not found: " + command.recommendationId()));
 
-        // ✅ ELIMINAR RECOMMENDATION
         recommendationRepository.delete(recommendation);
     }
 
-    // ✅ MÉTODO PRIVADO PARA VALIDACIÓN ACL
-    private void validateUserExists(Long userId) {
-        userProfilesACL.fetchById(userId)
-                .orElseThrow(() -> new RuntimeException("User profile not found: " + userId));
-    }
-
-    // ✅ MÉTODO PRIVADO PARA CREAR COPIA ASIGNADA
     private Recommendation createAssignedCopy(Recommendation base, Long userId) {
         return Recommendation.assignToUser(
                 new UserId(userId),
@@ -128,12 +115,12 @@ public class RecommendationCommandServiceImpl implements RecommendationCommandSe
                 RecommendationStatus.ACTIVE
         );
     }
+
     @Override
     public Recommendation handleUpdate(Long recommendationId, UpdateRecommendationResource resource) {
         Recommendation recommendation = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> new RuntimeException("Recommendation not found: " + recommendationId));
 
-        // Actualiza solo los campos permitidos
         if (resource.reason() != null) recommendation.setReason(resource.reason());
         if (resource.notes() != null) recommendation.setNotes(resource.notes());
         if (resource.timeOfDay() != null) recommendation.setTimeOfDay(resource.timeOfDay());
