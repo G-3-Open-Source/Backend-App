@@ -1,7 +1,7 @@
 package pe.edu.upc.center.backendNutriSmart.mealplan.application.internal.queryservices;
 
 import org.springframework.stereotype.Service;
-import pe.edu.upc.center.backendNutriSmart.mealplan.application.internal.outboundservices.acl.ExternalRecipeService;
+import pe.edu.upc.center.backendNutriSmart.mealplan.application.internal.outboundservices.acl.ExternalMealPlanRecipeService;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.aggregates.MealPlan;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetAllMealPlanByProfileIdQuery;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetAllMealPlanQuery;
@@ -11,9 +11,7 @@ import pe.edu.upc.center.backendNutriSmart.mealplan.domain.services.MealPlanQuer
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanEntryRepository;
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanRepository;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanEntryDetailedResource;
-import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanEntryResource;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.queries.GetAllRecipesQuery;
-import pe.edu.upc.center.backendNutriSmart.recipes.infrastructure.persistence.jpa.repositories.RecipeRepository;
 import pe.edu.upc.center.backendNutriSmart.recipes.interfaces.rest.resources.RecipeResource;
 
 import java.util.List;
@@ -23,11 +21,11 @@ import java.util.Optional;
 public class MealPlanQueryServiceImpl implements MealPlanQueryService {
     private final MealPlanRepository mealPlanRepository;
     private final MealPlanEntryRepository mealPlanEntryRepository;
-    private final ExternalRecipeService externalRecipeService;
+    private final ExternalMealPlanRecipeService externalMealPlanRecipeService;
 
-    public MealPlanQueryServiceImpl(MealPlanRepository mealPlanRepository, MealPlanEntryRepository mealPlanEntryRepository , ExternalRecipeService externalRecipeService) {
+    public MealPlanQueryServiceImpl(MealPlanRepository mealPlanRepository, MealPlanEntryRepository mealPlanEntryRepository , ExternalMealPlanRecipeService externalMealPlanRecipeService) {
         this.mealPlanRepository = mealPlanRepository;
-        this.externalRecipeService = externalRecipeService;
+        this.externalMealPlanRecipeService = externalMealPlanRecipeService;
         this.mealPlanEntryRepository = mealPlanEntryRepository;
     }
     @Override
@@ -35,14 +33,14 @@ public class MealPlanQueryServiceImpl implements MealPlanQueryService {
         return this.mealPlanRepository.findById(query.mealPlanId());
     }
     public List<RecipeResource> getAllRecipes() {
-        return externalRecipeService.fetchAllRecipes();
+        return externalMealPlanRecipeService.fetchAllRecipes();
     }
 
     public List<MealPlanEntryDetailedResource> handle(GetEntriesWithRecipeInfo query) {
         var entries = mealPlanEntryRepository.findAllByMealPlanId(query.mealPlanId());
 
         return entries.stream().map(entry -> {
-            var recipeOpt = externalRecipeService.fetchRecipeById(entry.getRecipeId().recipeId());
+            var recipeOpt = externalMealPlanRecipeService.fetchRecipeById(entry.getRecipeId().recipeId());
             var recipe = recipeOpt.orElse(null);
             System.out.println("Entry ID: " + entry.getId());
             System.out.println("MealPlanType: " + entry.getMealPlanType());
@@ -62,7 +60,7 @@ public class MealPlanQueryServiceImpl implements MealPlanQueryService {
 
     @Override
     public List<RecipeResource> handle(GetAllRecipesQuery query) {
-        return externalRecipeService.fetchAllRecipes();
+        return externalMealPlanRecipeService.fetchAllRecipes();
     }
 
 

@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ExternalRecipeService {
+public class ExternalMealPlanRecipeService {
 
     private final RecipeContextFacade recipeContextFacade;
 
-    public ExternalRecipeService(RecipeContextFacade recipeContextFacade) {
+    public ExternalMealPlanRecipeService(RecipeContextFacade recipeContextFacade) {
         this.recipeContextFacade = recipeContextFacade;
     }
 
