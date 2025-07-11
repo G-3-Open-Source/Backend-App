@@ -38,10 +38,11 @@ public class Ingredient extends AuditableAbstractAggregateRoot<Ingredient> {
     private double fats;
 
     @Embedded
-    @AttributeOverride(name = "macronutrientValuesId", column = @Column(name = "macronutrient_values_id", nullable = false))
+    @AttributeOverrides({
+            @AttributeOverride(name = "macronutrientValuesId", column = @Column(name = "macronutrient_values_id", nullable = false))
+    })
     private MacronutrientValuesId macronutrientValuesId = new MacronutrientValuesId();
 
-    // 🔗 Relación inversa con Recipe
     @ManyToMany(mappedBy = "ingredients")
     private Set<Recipe> recipes = new HashSet<>();
 

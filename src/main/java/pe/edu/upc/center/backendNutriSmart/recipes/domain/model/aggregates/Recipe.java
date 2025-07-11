@@ -17,9 +17,10 @@ import java.util.Set;
 @ToString
 public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
 
-    // 👤 Usuario creador (Value Object)
     @Embedded
-    @AttributeOverride(name = "userId", column = @Column(name = "user_id", nullable = false))
+    @AttributeOverrides({
+            @AttributeOverride(name = "value", column = @Column(name = "user_id", nullable = false))
+    })
     private UserId userId;
 
     @Column(name = "name", nullable = false)
@@ -34,7 +35,6 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
     @Column(name = "difficulty")
     private String difficulty;
 
-    // 🔗 Relaciones con entidades
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -43,7 +43,6 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
     @JoinColumn(name = "recipe_type_id", nullable = false)
     private RecipeType recipeType;
 
-    // 🔗 Relación con Ingredientes
     @ManyToMany
     @JoinTable(
             name = "recipe_ingredients",

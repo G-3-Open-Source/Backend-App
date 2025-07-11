@@ -27,6 +27,7 @@ public class ActivityLevelController {
     public ActivityLevel create(@RequestBody ActivityLevel level) {
         level.setId(null);
 
+
         return repository.save(level);
     }
 }

@@ -42,6 +42,7 @@ public class AllergyController {
                 );
             }
         }
+        allergy.setId(0);
         return repository.save(allergy);
     }
 }
