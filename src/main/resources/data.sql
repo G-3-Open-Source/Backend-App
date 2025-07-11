@@ -95,3 +95,41 @@ INSERT INTO recommendations (id, user_id, template_id, reason, notes, time_of_da
                                                                                                                                            (3, NULL, 3, 'Consumo bajo de micronutrientes.', 'Agregar verduras variadas a cada comida.', 'EVENING', 7.0, 'ACTIVE', NULL, NOW(), NOW()),
                                                                                                                                            (4, NULL, 4, 'Ingesta elevada de ultraprocesados.', 'Reducir la cantidad de snacks ultraprocesados.', 'EVENING', 6.5, 'ACTIVE', NULL, NOW(), NOW()),
                                                                                                                                            (5, NULL, 5, 'Indicios de fatiga y sueño irregular.', 'Ajustar horario y condiciones para dormir mejor.', 'EVENING', 9.0, 'ACTIVE', NULL, NOW(), NOW());
+
+-- ==============================================
+-- SEED DE MEAL PLANS
+-- ==============================================
+INSERT INTO meal_plans (
+    is_current,
+    total_calories,
+    total_carbs,
+    total_fats,
+    total_proteins,
+    user_profile_id,
+    created_at,
+    updated_at,
+    category,
+    name,
+    description
+) VALUES
+-- 1
+(true, 2200, 250, 70, 130, 1, NOW(), NOW(), 'Ganar masa muscular', 'Plan Hipercalórico', 'Plan diseñado para subir de masa muscular en 8 semanas.'),
+-- 2
+(false, 1800, 150, 60, 110, 2, NOW(), NOW(), 'Perder peso', 'Plan Definición', 'Ideal para reducir grasa y mantener masa magra.'),
+-- 3
+(true, 2000, 200, 65, 120, 3, NOW(), NOW(), 'Balanceado', 'Plan Equilibrado', 'Plan de mantenimiento con proporciones balanceadas.'),
+-- 4
+(false, 1600, 130, 45, 100, 4, NOW(), NOW(), 'Vegetariano', 'Plan Veggie', 'Alimentación basada en vegetales y proteínas vegetales.'),
+-- 5
+(true, 2400, 270, 80, 140, 5, NOW(), NOW(), 'Deportistas', 'Plan Atleta', 'Diseñado para alto rendimiento físico.'),
+-- 6
+(false, 1900, 160, 50, 110, 6, NOW(), NOW(), 'Keto', 'Plan Cetogénico', 'Bajo en carbohidratos, alto en grasas buenas.'),
+-- 7
+(false, 2100, 200, 70, 125, 7, NOW(), NOW(), 'Balanceado', 'Plan Diario', 'Usado para consumo diario promedio.'),
+-- 8
+(true, 1750, 140, 55, 105, 8, NOW(), NOW(), 'Diabético', 'Plan Control Glucosa', 'Optimizado para control de azúcar en sangre.'),
+-- 9
+(false, 2300, 250, 75, 130, 9, NOW(), NOW(), 'Fitness', 'Plan Fit', 'Mezcla de ganancia muscular y baja grasa.'),
+-- 10
+(true, 1500, 120, 40, 90, 10, NOW(), NOW(), 'Ayuno intermitente', 'Plan 16/8', 'Plan adaptado a horarios de ayuno intermitente.');
+
