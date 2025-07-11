@@ -1,5 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.recipes.aplication.internal.commandservices;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.aggregates.Recipe;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.AddIngredientToRecipeCommand;
@@ -25,7 +26,7 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
     private final IngredientRepository ingredientRepository;
     private final ExternalProfileAndTrackingService externalProfileAndTrackingService;
 
-    public RecipeCommandServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository, RecipeTypeRepository recipeTypeRepository, IngredientRepository ingredientRepository, ExternalProfileAndTrackingService externalProfileAndTrackingService) {
+    public RecipeCommandServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository, RecipeTypeRepository recipeTypeRepository, IngredientRepository ingredientRepository, @Lazy ExternalProfileAndTrackingService externalProfileAndTrackingService) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.recipeTypeRepository = recipeTypeRepository;
