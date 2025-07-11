@@ -23,7 +23,6 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
     @AttributeOverrides({
             @AttributeOverride(name = "value", column = @Column(name = "user_id", nullable = true)) // ← nullable = true
     })
-    // Eliminar @NotNull para permitir recommendations sin asignar
     private UserId userId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
