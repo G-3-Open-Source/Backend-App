@@ -41,7 +41,6 @@ public class RecommendationController {
         this.recommendationRepository = recommendationRepository;
     }
 
-    // ✅ 1. AUTO-ASIGNAR RECOMMENDATIONS (endpoint principal)
     @PostMapping("/auto-assign/{userId}")
     public ResponseEntity<List<RecommendationResource>> autoAssignRecommendations(@PathVariable Long userId) {
         try {
@@ -64,7 +63,6 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 2. ASIGNAR RECOMMENDATION ESPECÍFICA
     @PostMapping("/assign")
     public ResponseEntity<RecommendationResource> assignSpecificRecommendation(@RequestBody AssignRecommendationResource resource) {
         try {
@@ -89,19 +87,15 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 3. CREAR RECOMMENDATION BASE (sin asignar)
     @PostMapping("/base")
     public ResponseEntity<RecommendationResource> createBaseRecommendation(@RequestBody CreateRecommendationResource resource) {
         try {
-            // Validación: resource válido y templateId presente
             if (resource == null || resource.templateId() == null) {
                 return ResponseEntity.badRequest().build();
             }
-            // Llama al servicio para crear recommendation base
             int recommendationId = commandService.handle(
                     CreateRecommendationCommandFromResourceAssembler.toCommandFromResource(resource)
             );
-            // Busca la recommendation recién creada
             return recommendationRepository.findById((long) recommendationId)
                     .map(RecommendationResourceFromEntityAssembler::toResourceFromEntity)
                     .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
@@ -113,7 +107,6 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 4. OBTENER RECOMMENDATIONS POR USUARIO
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<RecommendationResource>> getUserRecommendations(@PathVariable Long userId) {
         try {
@@ -128,7 +121,6 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 5. ELIMINAR RECOMMENDATION
     @DeleteMapping("/{recommendationId}")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long recommendationId) {
         try {
@@ -145,7 +137,6 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 6. OBTENER TODAS LAS RECOMMENDATIONS (admin)
     @GetMapping
     public ResponseEntity<List<RecommendationResource>> getAllRecommendations() {
         try {
@@ -160,7 +151,6 @@ public class RecommendationController {
         }
     }
 
-    // ✅ 7. ACTUALIZAR RECOMMENDATION
     @PutMapping("/{recommendationId}")
     public ResponseEntity<RecommendationResource> updateRecommendation(
             @PathVariable Long recommendationId,

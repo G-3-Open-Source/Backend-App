@@ -8,8 +8,8 @@ public record RecommendationResource(
         Long templateId,
         String reason,
         String notes,
-        String timeOfDay,        // String en lugar de TimeOfDay
+        String timeOfDay,
         Double score,
-        String status,           // String en lugar de RecommendationStatus
+        String status,
         LocalDateTime assignedAt
 ) {}

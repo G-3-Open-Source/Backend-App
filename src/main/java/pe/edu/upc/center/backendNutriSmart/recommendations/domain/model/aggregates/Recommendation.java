@@ -19,9 +19,13 @@ import java.time.LocalDateTime;
 @Table(name = "recommendations")
 public class Recommendation extends AuditableAbstractAggregateRoot<Recommendation> {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "user_id", nullable = true)) // ← nullable = true
+            @AttributeOverride(name = "value", column = @Column(name = "user_id", nullable = true))
     })
     private UserId userId;
 
@@ -56,12 +60,11 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
     @NotNull(message = "El estado no puede ser nulo")
     private RecommendationStatus status;
 
-    @Column(name = "assigned_at", nullable = true) // ← nullable = true
+    @Column(name = "assigned_at", nullable = true)
     private LocalDateTime assignedAt;
 
     public Recommendation() {}
 
-    // Constructor para crear recommendation SIN ASIGNAR
     public Recommendation(RecommendationTemplate template, String reason, String notes,
                           TimeOfDay timeOfDay, Double score, RecommendationStatus status) {
         this.userId = null; // Sin usuario asignado
@@ -74,7 +77,6 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
         this.assignedAt = null; // Sin fecha de asignación
     }
 
-    // Constructor para crear recommendation ASIGNADA
     private Recommendation(UserId userId, RecommendationTemplate template, String reason, String notes,
                            TimeOfDay timeOfDay, Double score, RecommendationStatus status) {
         this.userId = userId;
@@ -87,7 +89,6 @@ public class Recommendation extends AuditableAbstractAggregateRoot<Recommendatio
         this.assignedAt = LocalDateTime.now();
     }
 
-    // Factory method para asignar recommendation a usuario
     public static Recommendation assignToUser(UserId userId, Long templateId, String reason, String notes,
                                               TimeOfDay timeOfDay, Double score, RecommendationStatus status) {
         RecommendationTemplate template = new RecommendationTemplate();
