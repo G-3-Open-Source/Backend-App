@@ -1,6 +1,8 @@
 package pe.edu.upc.center.backendNutriSmart.profiles.domain.model.Entities;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +15,8 @@ import lombok.*;
 public class Objective {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
     @Column(name = "objective_name", length = 100, nullable = false)

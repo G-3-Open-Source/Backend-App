@@ -24,6 +24,7 @@ public class ObjectiveController {
 
     @PostMapping
     public Objective create(@RequestBody Objective obj) {
+        obj.setId(0);
         return repository.save(obj);
     }
 }
