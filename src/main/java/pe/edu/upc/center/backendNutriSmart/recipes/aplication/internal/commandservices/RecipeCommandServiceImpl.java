@@ -6,11 +6,13 @@ import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.AddIngr
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.CreateRecipeCommand;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.DeleteRecipeCommand;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.UpdateRecipeCommand;
+import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.valueobjects.UserId;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.services.RecipeCommandService;
 import pe.edu.upc.center.backendNutriSmart.recipes.infrastructure.persistence.jpa.repositories.CategoryRepository;
 import pe.edu.upc.center.backendNutriSmart.recipes.infrastructure.persistence.jpa.repositories.IngredientRepository;
 import pe.edu.upc.center.backendNutriSmart.recipes.infrastructure.persistence.jpa.repositories.RecipeRepository;
 import pe.edu.upc.center.backendNutriSmart.recipes.infrastructure.persistence.jpa.repositories.RecipeTypeRepository;
+import pe.edu.upc.center.backendNutriSmart.recipes.aplication.internal.outboundedservices.ExternalProfileAndTrackingService;
 
 import java.util.Optional;
 
@@ -21,12 +23,14 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
     private final CategoryRepository categoryRepository;
     private final RecipeTypeRepository recipeTypeRepository;
     private final IngredientRepository ingredientRepository;
+    private final ExternalProfileAndTrackingService externalProfileAndTrackingService;
 
-    public RecipeCommandServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository,  RecipeTypeRepository recipeTypeRepository, IngredientRepository ingredientRepository) {
+    public RecipeCommandServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository, RecipeTypeRepository recipeTypeRepository, IngredientRepository ingredientRepository, ExternalProfileAndTrackingService externalProfileAndTrackingService) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.recipeTypeRepository = recipeTypeRepository;
         this.ingredientRepository = ingredientRepository;
+        this.externalProfileAndTrackingService = externalProfileAndTrackingService;
     }
 
     @Override
@@ -35,6 +39,9 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
         if (recipeRepository.existsByName(command.name())) {
             throw new IllegalArgumentException("A recipe with the name " + command.name() + " already exists.");
         }
+
+        // Validar existencia de UserId
+        externalProfileAndTrackingService.validateUserExists(new UserId(command.userId()));
 
         var category = categoryRepository.findByName(command.categoryName())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
@@ -52,16 +59,14 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
                 recipeType
         );
 
-
         try {
             this.recipeRepository.save(recipe);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error while saving enrollment: " + e.getMessage());
+            throw new IllegalArgumentException("Error while saving recipe: " + e.getMessage());
         }
 
         return recipe.getId();
     }
-
 
     @Override
     public Optional<Recipe> handle(UpdateRecipeCommand command) {
@@ -96,11 +101,10 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
         try {
             this.recipeRepository.save(recipe);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error while saving enrollment: " + e.getMessage());
+            throw new IllegalArgumentException("Error while saving recipe: " + e.getMessage());
         }
         return Optional.of(recipe);
     }
-
 
     @Override
     public void handle(DeleteRecipeCommand command) {
@@ -110,7 +114,7 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
         try {
             this.recipeRepository.deleteById(command.recipeId());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error while saving enrollment: " + e.getMessage());
+            throw new IllegalArgumentException("Error while deleting recipe: " + e.getMessage());
         }
     }
 
@@ -134,6 +138,4 @@ public class RecipeCommandServiceImpl implements RecipeCommandService {
         recipe.getIngredients().add(ingredient);
         recipeRepository.save(recipe);
     }
-
 }
-

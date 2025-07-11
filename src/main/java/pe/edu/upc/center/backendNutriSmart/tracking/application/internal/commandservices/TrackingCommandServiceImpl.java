@@ -4,6 +4,7 @@ package pe.edu.upc.center.backendNutriSmart.tracking.application.internal.comman
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanEntryRepository;
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanTypeRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.outboundservices.acl.ExternalProfileService;
+import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.outboundservices.acl.ExternalRecipeService;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MealPlanType;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingGoal;
@@ -28,20 +29,26 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
     private final MacronutrientValuesRepository macronutrientValuesRepository;
     private final TrackingMealPlanTypeRepository trackingMealPlanTypeRepository;
     ExternalProfileService externalProfileService;
+    private final ExternalRecipeService externalRecipeService;
 
     public TrackingCommandServiceImpl(TrackingRepository trackingRepository, TrackingMealPlanEntryRepository mealPlanEntryRepository,
                                       TrackingGoalRepository trackingGoalRepository, MacronutrientValuesRepository macronutrientValuesRepository,
-                                      TrackingMealPlanTypeRepository mealPlanTypeRepository, ExternalProfileService externalProfileService) {
+                                      TrackingMealPlanTypeRepository mealPlanTypeRepository, ExternalProfileService externalProfileService,
+                                      ExternalRecipeService externalRecipeService) {
         this.trackingRepository = trackingRepository;
         this.trackingMealPlanEntryRepository = mealPlanEntryRepository;
         this.trackingGoalRepository = trackingGoalRepository;
         this.macronutrientValuesRepository = macronutrientValuesRepository;
         this.trackingMealPlanTypeRepository = mealPlanTypeRepository;
         this.externalProfileService = externalProfileService;
+        this.externalRecipeService = externalRecipeService;
     }
 
     @Override
     public int handle(CreateMealPlanEntryToTrackingCommand command) {
+        if (!externalRecipeService.existsByRecipeId(command.recipeId())) {
+            throw new IllegalArgumentException("Recipe not found in Recipe bounded context with id: " + command.recipeId());
+        }
         // Buscar el tracking por ID de usuario
         Optional<Tracking> trackingOpt = trackingRepository.findByUserId(command.userId());
 
@@ -105,6 +112,10 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
     @Override
     public Optional<Tracking> handle(UpdateMealPlanEntryInTrackingCommand command) {
+        // Verificar que la receta existe en el bounded context de Recipe
+        if (!externalRecipeService.existsByRecipeId(command.recipeId())) {
+            throw new IllegalArgumentException("Recipe not found in Recipe bounded context with id: " + command.recipeId());
+        }
         Long trackingId = command.TrackingId();
 
         // Si el trackingId no viene en el command (es null o 0), lo obtenemos desde el meal plan entry
