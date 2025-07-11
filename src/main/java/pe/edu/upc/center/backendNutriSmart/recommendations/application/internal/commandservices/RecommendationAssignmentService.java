@@ -24,18 +24,15 @@ public class RecommendationAssignmentService implements pe.edu.upc.center.backen
 
     @Override
     public List<Recommendation> autoAssignRecommendations(Long userId) {
-        // 1. Obtener templates disponibles
         List<RecommendationTemplate> allTemplates = templateService.getAllTemplates();
 
         if (allTemplates.isEmpty()) {
             return new ArrayList<>();
         }
 
-        // 2. Seleccionar 1 template aleatorio
         Random random = new Random(userId);
         RecommendationTemplate selectedTemplate = allTemplates.get(random.nextInt(allTemplates.size()));
 
-        // 3. Buscar recommendations BASE (sin asignar) de ese template
         List<Recommendation> baseRecommendations = recommendationRepository
                 .findByTemplateAndUserIdIsNull(selectedTemplate);
 
@@ -43,11 +40,9 @@ public class RecommendationAssignmentService implements pe.edu.upc.center.backen
             return new ArrayList<>();
         }
 
-        // 4. Tomar máximo 3 recommendations aleatorias
         Collections.shuffle(baseRecommendations, random);
         int assignCount = Math.min(3, baseRecommendations.size());
 
-        // 5. CREAR COPIAS para el usuario (NO modificar las originales)
         List<Recommendation> userRecommendations = baseRecommendations.stream()
                 .limit(assignCount)
                 .map(base -> createCopyForUser(base, userId))
@@ -61,17 +56,14 @@ public class RecommendationAssignmentService implements pe.edu.upc.center.backen
         RecommendationTemplate template = templateService.findById(templateId)
                 .orElseThrow(() -> new RuntimeException("Template not found"));
 
-        // Buscar una recommendation BASE disponible del template
         Recommendation baseRecommendation = recommendationRepository
                 .findFirstByTemplateAndUserIdIsNull(template)
                 .orElseThrow(() -> new RuntimeException("No hay recommendations disponibles para este template"));
 
-        // CREAR COPIA para el usuario
         Recommendation userRecommendation = createCopyForUser(baseRecommendation, userId);
         return recommendationRepository.save(userRecommendation);
     }
 
-    // MÉTODO CLAVE: Crear copia para usuario específico
     private Recommendation createCopyForUser(Recommendation base, Long userId) {
         Recommendation copy = new Recommendation();
         copy.setUserId(new UserId(userId));
