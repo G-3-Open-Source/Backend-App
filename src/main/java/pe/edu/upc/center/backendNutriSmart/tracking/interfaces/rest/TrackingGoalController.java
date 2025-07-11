@@ -205,4 +205,64 @@ public class TrackingGoalController {
 
         return ResponseEntity.status(201).body(goalId);
     }
+
+    @Operation(
+            summary = "Create tracking goal from profile objective",
+            description = "Creates a tracking goal automatically based on the user's profile objective",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Tracking goal created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid profile or objective"),
+                    @ApiResponse(responseCode = "409", description = "Tracking goal already exists for user")
+            }
+    )
+    @PostMapping("/from-profile/{profileId}")
+    public ResponseEntity<Long> createTrackingGoalFromProfile(@PathVariable Long profileId) {
+        try {
+            Long goalId = trackingGoalCommandService.createTrackingGoalFromProfile(profileId);
+            return ResponseEntity.status(201).body(goalId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(409).build(); // Conflict - goal already exists
+        }
+    }
+
+    @Operation(
+            summary = "Update tracking goal from profile objective",
+            description = "Updates an existing tracking goal based on the current user's profile objective",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Tracking goal updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid profile or objective"),
+                    @ApiResponse(responseCode = "404", description = "Tracking goal not found for user")
+            }
+    )
+    @PutMapping("/from-profile/{profileId}")
+    public ResponseEntity<Void> updateTrackingGoalFromProfile(@PathVariable Long profileId) {
+        try {
+            trackingGoalCommandService.updateTrackingGoalFromProfile(profileId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Operation(
+            summary = "Check if tracking goal exists for profile",
+            description = "Checks if a tracking goal exists for the given profile ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Check completed successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid profile ID")
+            }
+    )
+    @GetMapping("/exists/profile/{profileId}")
+    public ResponseEntity<Boolean> existsTrackingGoalForProfile(@PathVariable Long profileId) {
+        try {
+            boolean exists = trackingGoalCommandService.existsTrackingGoalForProfile(profileId);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

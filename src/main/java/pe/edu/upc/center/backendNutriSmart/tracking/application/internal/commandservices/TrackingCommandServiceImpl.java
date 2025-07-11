@@ -62,15 +62,13 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
                 command.DayNumber()
         );
 
+        newEntry.setTracking(tracking);
+
         // Agregar al tracking (esto solo lo agrega a la lista en memoria)
         tracking.addMealPlanEntry(newEntry);
 
         // NUEVO: Guardar el tracking primero
         Tracking savedTracking = trackingRepository.save(tracking);
-
-        // NUEVO: Ahora guardar la entry con la FK
-        newEntry.setTracking(savedTracking);
-        trackingMealPlanEntryRepository.save(newEntry);
 
         return savedTracking.getId();
     }
