@@ -1,6 +1,7 @@
 package pe.edu.upc.center.backendNutriSmart.tracking.application.internal.commandservices;
 
 
+import org.springframework.context.annotation.Lazy;
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanEntryRepository;
 import pe.edu.upc.center.backendNutriSmart.mealplan.infrastructure.persistence.jpa.repositories.MealPlanTypeRepository;
 import pe.edu.upc.center.backendNutriSmart.tracking.application.internal.outboundservices.acl.ExternalProfileService;
@@ -34,7 +35,7 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
     public TrackingCommandServiceImpl(TrackingRepository trackingRepository, TrackingMealPlanEntryRepository mealPlanEntryRepository,
                                       TrackingGoalRepository trackingGoalRepository, MacronutrientValuesRepository macronutrientValuesRepository,
                                       TrackingMealPlanTypeRepository mealPlanTypeRepository, ExternalProfileService externalProfileService,
-                                      ExternalRecipeService externalRecipeService) {
+                                      @Lazy ExternalRecipeService externalRecipeService) {
         this.trackingRepository = trackingRepository;
         this.trackingMealPlanEntryRepository = mealPlanEntryRepository;
         this.trackingGoalRepository = trackingGoalRepository;

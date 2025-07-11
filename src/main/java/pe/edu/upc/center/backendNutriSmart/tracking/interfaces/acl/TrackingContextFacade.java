@@ -21,17 +21,20 @@ public class TrackingContextFacade {
     private final TrackingGoalCommandService trackingGoalCommandService;
     private final TrackingGoalQueryService trackingGoalQueryService;
     private final MacronutrientValuesCommandService macronutrientValuesCommandService;
+    private final MacronutrientValuesQueryService macronutrientValuesQueryService; // Agregar este
 
     public TrackingContextFacade(TrackingCommandService trackingCommandService,
                                  TrackingQueryService trackingQueryService,
                                  TrackingGoalCommandService trackingGoalCommandService,
                                  TrackingGoalQueryService trackingGoalQueryService,
-                                 MacronutrientValuesCommandService macronutrientValuesCommandService) {
+                                 MacronutrientValuesCommandService macronutrientValuesCommandService,
+                                 MacronutrientValuesQueryService macronutrientValuesQueryService) { // Agregar este
         this.trackingCommandService = trackingCommandService;
         this.trackingQueryService = trackingQueryService;
         this.trackingGoalCommandService = trackingGoalCommandService;
         this.trackingGoalQueryService = trackingGoalQueryService;
         this.macronutrientValuesCommandService = macronutrientValuesCommandService;
+        this.macronutrientValuesQueryService = macronutrientValuesQueryService; // Agregar este
     }
 
     // === TRACKING OPERATIONS ===
@@ -117,6 +120,20 @@ public class TrackingContextFacade {
      */
     public Long createMacronutrientValues(CreateMacronutrientValuesCommand command) {
         return macronutrientValuesCommandService.handle(command);
+    }
+
+    /**
+     * Obtiene macronutrientes por ID
+     */
+    public Optional<MacronutrientValues> getMacronutrientValuesById(Long macronutrientValuesId) {
+        return macronutrientValuesQueryService.handle(new GetMacronutrientValuesByIdQuery(macronutrientValuesId));
+    }
+
+    /**
+     * Valida si existen macronutrientes con el ID especificado
+     */
+    public boolean validateMacronutrientValuesExists(Long macronutrientValuesId) {
+        return getMacronutrientValuesById(macronutrientValuesId).isPresent();
     }
 
     // === BUSINESS OPERATIONS ===

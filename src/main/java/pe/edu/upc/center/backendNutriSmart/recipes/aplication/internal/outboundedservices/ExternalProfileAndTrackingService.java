@@ -1,5 +1,6 @@
 package pe.edu.upc.center.backendNutriSmart.recipes.aplication.internal.outboundedservices;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.center.backendNutriSmart.profiles.interfaces.acl.UserProfilesContextFacade;
 import pe.edu.upc.center.backendNutriSmart.tracking.interfaces.acl.TrackingContextFacade;
@@ -15,7 +16,7 @@ public class ExternalProfileAndTrackingService {
     private final TrackingContextFacade trackingContextFacade;
 
     public ExternalProfileAndTrackingService(UserProfilesContextFacade userProfilesContextFacade,
-                                             TrackingContextFacade trackingContextFacade) {
+                                             @Lazy TrackingContextFacade trackingContextFacade) {
 
         this.userProfilesContextFacade = userProfilesContextFacade;
         this.trackingContextFacade = trackingContextFacade;
@@ -43,7 +44,7 @@ public class ExternalProfileAndTrackingService {
     }
 
     public void validateMacronutrientValuesExists(MacronutrientValuesId macronutrientValuesId) {
-        if (trackingContextFacade.getTargetMacronutrients(macronutrientValuesId.macronutrientValuesId()).isEmpty()) {
+        if (!trackingContextFacade.validateMacronutrientValuesExists(macronutrientValuesId.macronutrientValuesId())) {
             throw new IllegalArgumentException("MacronutrientValues not found with ID: " + macronutrientValuesId.macronutrientValuesId());
         }
     }

@@ -3,6 +3,7 @@ package pe.edu.upc.center.backendNutriSmart.tracking.application.internal.querys
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.MacronutrientValues;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.Entities.TrackingGoal;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetConsumedMacrosQuery;
+import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetMacronutrientValuesByIdQuery;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.model.queries.GetTargetMacronutrientsQuery;
 import pe.edu.upc.center.backendNutriSmart.tracking.domain.services.MacronutrientValuesQueryService;
 import pe.edu.upc.center.backendNutriSmart.tracking.infrastructure.persistence.jpa.repositories.MacronutrientValuesRepository;
@@ -11,13 +12,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+
 @Service
 public class MacronutrientValuesQueryServiceImpl implements MacronutrientValuesQueryService {
-    private final TrackingGoalRepository trackingGoalRepository;
+
     private final MacronutrientValuesRepository macronutrientValuesRepository;
-    public MacronutrientValuesQueryServiceImpl(MacronutrientValuesRepository macronutrientValuesRepository, TrackingGoalRepository trackingGoalRepository) {
+
+    public MacronutrientValuesQueryServiceImpl(MacronutrientValuesRepository macronutrientValuesRepository) {
         this.macronutrientValuesRepository = macronutrientValuesRepository;
-        this.trackingGoalRepository = trackingGoalRepository;
     }
 
+    // Métodos existentes...
+
+    @Override
+    public Optional<MacronutrientValues> handle(GetMacronutrientValuesByIdQuery query) {
+        return macronutrientValuesRepository.findById(query.macronutrientValuesId());
+    }
 }
