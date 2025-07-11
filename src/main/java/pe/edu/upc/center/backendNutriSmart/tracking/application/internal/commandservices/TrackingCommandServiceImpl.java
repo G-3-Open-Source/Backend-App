@@ -105,7 +105,21 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
 
     @Override
     public Optional<Tracking> handle(UpdateMealPlanEntryInTrackingCommand command) {
-        Optional<Tracking> trackingOpt = trackingRepository.findById(command.TrackingId());
+        Long trackingId = command.TrackingId();
+
+        // Si el trackingId no viene en el command (es null o 0), lo obtenemos desde el meal plan entry
+        if (trackingId == null || trackingId == 0L) {
+            Optional<TrackingMealPlanEntry> mealPlanEntryOpt = trackingMealPlanEntryRepository.findById(command.MealPlanEntryId());
+
+            if (mealPlanEntryOpt.isEmpty()) {
+                throw new IllegalArgumentException("MealPlan not found with id: " + command.MealPlanEntryId());
+            }
+
+            TrackingMealPlanEntry existingEntry = mealPlanEntryOpt.get();
+            trackingId = (long) existingEntry.getTracking().getId();
+        }
+
+        Optional<Tracking> trackingOpt = trackingRepository.findById(trackingId);
 
         if (trackingOpt.isEmpty()) {
             return Optional.empty();
@@ -124,23 +138,16 @@ public class TrackingCommandServiceImpl implements TrackingCommandService {
         MealPlanType mealPlanType = trackingMealPlanTypeRepository.findByName(command.mealPlanType())
                 .orElseThrow(() -> new IllegalArgumentException("Tipo de plan de comida inválido: " + command.mealPlanType()));
 
-        // Remover el MealPlanEntry de memoria Y de BD
-        tracking.removeMealPlanEntry(mealPlanEntry);
-        trackingMealPlanEntryRepository.delete(mealPlanEntry); // NUEVO
+        // ACTUALIZAR en lugar de eliminar y crear
+        mealPlanEntry.setRecipeId(command.recipeId());
+        mealPlanEntry.setMealPlanType(mealPlanType);
+        mealPlanEntry.setDayNumber(command.dayNumber());
 
-        // Crear nuevo entry con los datos actualizados
-        TrackingMealPlanEntry updatedEntry = new TrackingMealPlanEntry(
-                command.recipeId(),
-                mealPlanType,
-                command.dayNumber()
-        );
+        // Guardar el entry actualizado
+        trackingMealPlanEntryRepository.save(mealPlanEntry);
 
-        tracking.addMealPlanEntry(updatedEntry);
-
-        // NUEVO: Guardar tracking y luego la entry
+        // Guardar el tracking también (por si hay cambios en cascada)
         Tracking savedTracking = trackingRepository.save(tracking);
-        updatedEntry.setTracking(savedTracking);
-        trackingMealPlanEntryRepository.save(updatedEntry);
 
         return Optional.of(savedTracking);
     }
