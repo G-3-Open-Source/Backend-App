@@ -4,16 +4,20 @@ import org.springframework.stereotype.Service;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.aggregates.Ingredient;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.CreateIngredientCommand;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.commands.DeleteIngredientCommand;
+import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.valueobjects.MacronutrientValuesId;
 import pe.edu.upc.center.backendNutriSmart.recipes.domain.services.IngredientCommandService;
 import pe.edu.upc.center.backendNutriSmart.recipes.infrastructure.persistence.jpa.repositories.IngredientRepository;
+import pe.edu.upc.center.backendNutriSmart.recipes.aplication.internal.outboundedservices.ExternalProfileAndTrackingService;
 
 @Service
 public class IngredientCommandServiceImpl implements IngredientCommandService {
 
     private final IngredientRepository ingredientRepository;
+    private final ExternalProfileAndTrackingService externalProfileAndTrackingService;
 
-    public IngredientCommandServiceImpl(IngredientRepository ingredientRepository) {
+    public IngredientCommandServiceImpl(IngredientRepository ingredientRepository, ExternalProfileAndTrackingService externalProfileAndTrackingService) {
         this.ingredientRepository = ingredientRepository;
+        this.externalProfileAndTrackingService = externalProfileAndTrackingService;
     }
 
     @Override
@@ -22,6 +26,9 @@ public class IngredientCommandServiceImpl implements IngredientCommandService {
         if (ingredientRepository.existsByName(command.name())) {
             throw new IllegalArgumentException("An ingredient with the name " + command.name() + " already exists.");
         }
+
+        // Validar existencia de MacronutrientValuesId
+        externalProfileAndTrackingService.validateMacronutrientValuesExists(new MacronutrientValuesId(command.macronutrientValuesId()));
 
         // Crear ingrediente
         var ingredient = new Ingredient(
