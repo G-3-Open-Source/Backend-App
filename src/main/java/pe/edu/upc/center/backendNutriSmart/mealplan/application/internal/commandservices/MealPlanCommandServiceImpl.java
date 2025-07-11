@@ -39,6 +39,7 @@ public class MealPlanCommandServiceImpl implements MealPlanCommandService {
                 return new MealPlanEntry(
                         entryCommand.recipeId(),
                         mealPlanType,
+                        entryCommand.day(),
                         mealPlan
                 );
             })
@@ -97,6 +98,7 @@ public class MealPlanCommandServiceImpl implements MealPlanCommandService {
             var entry = new MealPlanEntry(
                     entryCommand.recipeId(),
                     mealPlanType,
+                    entryCommand.day(),
                     mealPlan
             );
             newEntries.add(entry);

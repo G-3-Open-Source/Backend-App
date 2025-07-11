@@ -9,22 +9,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.aggregates.MealPlan;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.commands.DeleteMealPlanCommand;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetAllMealPlanQuery;
+import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetEntriesWithRecipeInfo;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.model.queries.GetMealPlanByIdQuery;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.services.MealPlanCommandService;
 import pe.edu.upc.center.backendNutriSmart.mealplan.domain.services.MealPlanQueryService;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.CreateMealPlanResource;
+import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanEntryDetailedResource;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanResource;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.CreateMealPlanCommandFromResourceAssembler;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.MealPlanResourceFromEntityAssembler;
 import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.transform.UpdateMealPlanCommandFromResourceAssembler;
+import pe.edu.upc.center.backendNutriSmart.mealplan.interfaces.rest.resources.MealPlanEntryDetailedResource;
+import pe.edu.upc.center.backendNutriSmart.recipes.domain.model.queries.GetAllRecipesQuery;
+import pe.edu.upc.center.backendNutriSmart.recipes.interfaces.rest.resources.RecipeResource;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:4200", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
 @RequestMapping(value = "/api/v1/meal-plan", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Meal Plan", description = "Meal plans Management Endpoints")
@@ -61,7 +63,7 @@ public class MealPlanController {
             }
     )
     @PostMapping
-    public ResponseEntity<MealPlanResource> createStudent(@RequestBody CreateMealPlanResource resource) {
+    public ResponseEntity<MealPlanResource> createMealPlan(@RequestBody CreateMealPlanResource resource) {
         // Create meal plan
         var createMealPlanCommand = CreateMealPlanCommandFromResourceAssembler.toCommandFromResource(resource);
         var mealPlanEntity = this.mealPlanCommandService.handle(createMealPlanCommand);
@@ -90,6 +92,18 @@ public class MealPlanController {
                         .map(MealPlanResourceFromEntityAssembler::toResourceFromEntity)
                         .toList()
         );
+    }
+    @GetMapping("/recipes")
+    public ResponseEntity<List<RecipeResource>> getAllRecipes() {
+        var getAllRecipesQuery = new GetAllRecipesQuery();
+        var recipes = mealPlanQueryService.handle(getAllRecipesQuery);
+        return ResponseEntity.ok(recipes);
+    }
+
+    @GetMapping("/detailed/{mealPlanId}")
+    public List<MealPlanEntryDetailedResource> getEntriesWithRecipeInfo(@PathVariable int mealPlanId) {
+        var getEntriesWithRecipeInfoQuery = new GetEntriesWithRecipeInfo(mealPlanId);
+        return mealPlanQueryService.handle(getEntriesWithRecipeInfoQuery);
     }
 
     @GetMapping("/{mealPlanId}")

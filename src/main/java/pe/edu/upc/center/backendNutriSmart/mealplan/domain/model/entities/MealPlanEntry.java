@@ -32,9 +32,10 @@ public class MealPlanEntry {
 
     public MealPlanEntry() {
     }
-    public MealPlanEntry(RecipeId recipeId, MealPlanType mealPlanType, MealPlan mealPlan) {
+    public MealPlanEntry(RecipeId recipeId, MealPlanType mealPlanType,int day, MealPlan mealPlan) {
         this.recipeId = recipeId;
         this.mealPlanType = mealPlanType;
+        this.day = day;
         this.mealPlan = mealPlan;
     }
 }
